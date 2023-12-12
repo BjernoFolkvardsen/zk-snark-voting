@@ -1,8 +1,8 @@
-# Protocol Project
+# Zk-snark-voting Protocol
 
-This is a basic Python project for a protocol with 5 phases: Setup, Registration, Voting, Tally, and Verification.
+## Overview
 
-## Project Structure
+Welcome to Zk-snark-voting Protocol! This is a Python project that leverages npm packages and the Circom language, which is implemented in Rust. This README will guide you through the setup process and provide essential information about the project.
 
 The project has the following structure:
 
@@ -31,44 +31,100 @@ protocol_project
 └── README.md
 ```
 
-## Setup
+## Prerequisites
 
-To set up the project, run the following command:
+Before you begin, ensure you have the following installed:
 
-```
-python setup.py install
-```
+- Python (version 3.11)
+- npm (version 10.1)
+- GNU Make (4.4)
 
-This will install all the necessary dependencies listed in the `requirements.txt` file.
+## Circom Setup
 
-## Running the Project
+Before proceeding with the project, you need to set up Circom. Follow these steps:
 
-To run the project, navigate to the `src` directory and run the following command:
+Check Circom to see how [Circom Installation Guide]([https://docs.circom.io/getting-started/installation/](https://docs.circom.io/getting-started/installation/))
 
-```
-python main.py
-```
+### Circum setup in short
+#### Installing Dependencies
 
-## Running the Tests
+You need several dependencies in your system to run Circom and its associated tools.
 
-To run the tests, navigate to the `tests` directory and run the following command:
+##### Rust
 
-```
-python -m unittest discover
-```
-
-## Circom Circuits
-
-This repository includes several Circom circuits, located in the `circuits` directory. These circuits are used to generate zk-SNARK proofs for various parts of the protocol.
-
-To compile the circuits, you need to have the Circom compiler installed. You can then run the following command:
+The core tool, the Circom compiler, is written in Rust. Install Rust using rustup. If you're using Linux or macOS, open a terminal and run:
 
 ```bash
-circom circuits/<circuit_name>.circom -o compiled/<circuit_name>.json
+curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
+```
+or use brew
+```bash
+brew install rust
+```
 
-## Contributing
+##### Node.js and npm/yarn
 
-Contributions are welcome. Please make sure to update tests as appropriate.
+Circom also relies on npm packages, so ensure Node.js and a package manager like npm or yarn are available. Install Node.js version 10 or higher.
+
+#### Installing Circom
+
+To install Circom from the source, clone the Circom repository:
+
+```bash
+git clone https://github.com/iden3/circom.git
+```
+
+Navigate to the Circom directory and use cargo build to compile:
+
+```bash
+cd circom
+cargo build --release
+```
+
+The installation takes approximately 3 minutes. Once complete, the circom binary is generated in the directory target/release. Install this binary:
+
+```bash
+cargo install --path circom
+```
+
+This command installs the circom binary in the directory $HOME/.cargo/bin.
+
+### Continue with Project Setup
+
+Now that you have set up Circom, continue with the rest of the project setup as mentioned in the main README file.
+
+## Installation
+
+1. Clone the repository:
+
+```bash
+git clone [https://github.com/yourusername/project-name.git](https://github.com/BjernoFolkvardsenDev/zk-snark-voting.git)
+cd zk-snark-voting
+```
+
+2. Install npm packages:
+
+```bash
+npm install
+```
+
+3. Install python packages:
+
+```bash
+make local-setup
+```
+
+## Usage
+
+1. Run the Python script:
+
+```bash
+make run
+```
+
+## Issues
+
+If you encounter any issues or have suggestions, please open an issue [here](https://github.com/BjernoFolkvardsenDev/zk-snark-voting/issues).
 
 ## License
 
