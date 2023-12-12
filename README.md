@@ -52,6 +52,15 @@ To run the tests, navigate to the `tests` directory and run the following comman
 python -m unittest discover
 ```
 
+## Circom Circuits
+
+This repository includes several Circom circuits, located in the `circuits` directory. These circuits are used to generate zk-SNARK proofs for various parts of the protocol.
+
+To compile the circuits, you need to have the Circom compiler installed. You can then run the following command:
+
+```bash
+circom circuits/<circuit_name>.circom -o compiled/<circuit_name>.json
+
 ## Contributing
 
 Contributions are welcome. Please make sure to update tests as appropriate.
