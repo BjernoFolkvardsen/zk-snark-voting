@@ -1,0 +1,35 @@
+# Voting Process
+
+
+** Code for sequence diagram **
+```
+order Election Authority, Registrar, Voter, Bulletin Board(BB), Tallier, Trusted Server
+Election Authority[icon: user, color:darkorchid] > Election Authority: Runs setup
+Election Authority > Bulletin Board(BB) [icon: database, color: green]: Eligble voters, candidate list, election public key, registrar public key, encryption and commitment public parameters, and zk proof key pair
+Voter[icon: user, color: darkorchid] > Voter: registervoter(id) -->(c_id, cr_id, t_ic)
+Voter > Registrar[icon: user, color: darkorchid]: Commitment c_id and identity id
+Registrar > Registrar: Register(): adds identity and commitment to list L, computes merkle tree root rtL, and signs pair (L, rtL)
+Registrar > Bulletin Board(BB): Commitments, Merkle tree root rtL, list of voters, and registrar signature
+opt [label: verify] {
+  Voter > Bulletin Board(BB): Verify published commitment to their identity
+}
+Voter > Voter: Vote(): generates ballot B, with encrypted vote e_v, pseudonym cr_id, and disjoint proof π_id
+if[label: if valid(B)] {
+  Voter > Bulletin Board(BB): Append(B)
+} else [label: if ! valid(B)] {
+ Voter > Bulletin Board(BB): Ballot B
+ Voter < Bulletin Board(BB): Rejects Ballot B
+}
+opt [label: verify] {
+  Voter > Bulletin Board(BB): Verify Ballot B is appended to BB
+}
+loop[label: null ballots] {
+  Trusted Server [icon: server, color: blue] > Bulletin Board(BB): Adds a null ballot B
+}
+Bulletin Board(BB) > Tallier[icon: user, color: darkorchid]: Gets all data from BB
+Tallier > Tallier: Calls tally(BB,sk_T)-> s,Π
+Tallier > Bulletin Board(BB): Publishes election result: s and proof of correct talling: Π
+opt[label verify]{
+  Voter > Bulletin Board(BB): verifyTally(BB,s,Π)
+}
+```
