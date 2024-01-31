@@ -1,3 +1,5 @@
+<p><a target="_blank" href="https://app.eraser.io/workspace/zx1sidB790zsXeMk08so" id="edit-in-eraser-github-link"><img alt="Edit in Eraser" src="https://firebasestorage.googleapis.com/v0/b/second-petal-295822.appspot.com/o/images%2Fgithub%2FOpen%20in%20Eraser.svg?alt=media&amp;token=968381c8-a7e7-472a-8ed6-4a6626da5501"></a></p>
+
 # Zk-snark-voting Protocol
 ## Overview
 Welcome to Zk-snark-voting Protocol! This is a Python project that leverages npm packages and the Circom language, which is implemented in Rust. This README will guide you through the setup process and provide essential information about the project.
@@ -102,4 +104,7 @@ make run
 If you encounter any issues or have suggestions, please open an issue [﻿here](https://github.com/BjernoFolkvardsenDev/zk-snark-voting/issues).
 
 ## License
-[﻿MIT](https://choosealicense.com/licenses/mit/)
+[﻿MIT](https://choosealicense.com/licenses/mit/) 
+
+
+<!--- Eraser file: https://app.eraser.io/workspace/zx1sidB790zsXeMk08so --->
