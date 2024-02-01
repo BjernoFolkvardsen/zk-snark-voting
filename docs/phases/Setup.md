@@ -3,7 +3,7 @@
 # Setup Phase
 **Sequence diagram**
 
-![Setup Phase](/.eraser/RbDOVHJAHDuOXl1xGAug___UydW6JsZqUfMKeGDrIN0gtNI4pO2___---figure---I9yCC2inCv5g16ovldESY---figure---Fl15x_tvHzS2hXAkHrgY5A.png "Setup Phase")
+![Setup Phase](/.eraser/RbDOVHJAHDuOXl1xGAug___UydW6JsZqUfMKeGDrIN0gtNI4pO2___---figure---jZ5bVTIsl_4p0T9IuGinP---figure---Fl15x_tvHzS2hXAkHrgY5A.png "Setup Phase")
 
 
 
