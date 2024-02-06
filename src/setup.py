@@ -1,6 +1,7 @@
 from Crypto.PublicKey import ElGamal, ECC
-from Crypto.Random import get_random_bytes
+from Crypto.Random import get_random_bytes, random
 from Crypto.Signature import eddsa
+from Crypto.Hash import SHA256
 from zkpy.ptau import PTau
 from zkpy.circuit import Circuit, GROTH, PLONK, FFLONK
 import os
@@ -10,8 +11,13 @@ import shamirs
 def setup():
     elgamal = setup_elgamal(256,10,20)
     setup_digital_signature()
-    setup_SHA_commitment()
-    setup_zk_SNARK()
+    m = b'Hello world!'
+    (com,rand) = SHA_commit(m)
+    print(m)
+    print(com)
+    print(rand)
+    print(SHA_commit_verify(com,m,rand))
+    #setup_zk_SNARK()
 
 def setup_elgamal(keysize,threshold,share_num):
     ElGamalKey = ElGamal.generate(256, get_random_bytes)
@@ -46,8 +52,14 @@ def setup_digital_signature():
 
     return (signing_key,verification_key)
 
-def setup_SHA_commitment():
-    pass  # Implementation goes here
+def SHA_commit(m):
+    random = random.getrandbits(256)
+    commitment = SHA256.new(random+m)
+    return (commitment.hexdigest(),random)
+
+def SHA_commit_verify(com,m,key):
+    return com == SHA256.new(key+m).hexdigest()
+    
 
 def setup_zk_SNARK():
     working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circom4/"
