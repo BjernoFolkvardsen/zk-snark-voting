@@ -25,7 +25,7 @@ local-setup:
 	echo "\033[0;32mAll done. Happy coding!\033[0m"
 
 run:
-	python src/setup.py
+	python src/registration.py
 
 
 # virtualenv --python=python3.5 .venv
