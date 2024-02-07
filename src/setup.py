@@ -13,7 +13,8 @@ class SetupManager:
         pass 
     
     def setup(self):
-        elgamal = self.setup_elgamal(256,10,20)
+        (pk,sk,p,g) = self.setup_elgamal(256)
+        shares = self.get_shamirs_shares(10,20,sk,p)
         self.setup_digital_signature()
         m = b'Hello world!'
         (com,rand) = self.SHA_commit(m)
@@ -23,22 +24,26 @@ class SetupManager:
         print(self.SHA_commit_verify(com,m,rand))
         #self.setup_zk_SNARK()
 
-    def setup_elgamal(self,keysize,threshold,share_num):
-        ElGamalKey = ElGamal.generate(256, get_random_bytes)
+    def setup_elgamal(self,keysize):
+        ElGamalKey = ElGamal.generate(keysize, get_random_bytes)
         # print("y/publickey:", ElGamalKey.y)
         # print("x/privateKey:", ElGamalKey.x)
         # print("p:", ElGamalKey.p)
         # print("g:", ElGamalKey.g)
 
         #print(ElGamalKey.x.to_bytes())
-        shares = shamirs.shares(ElGamalKey.x.__int__(), quantity=share_num, modulus=ElGamalKey.p.__int__(), threshold=threshold)
+        # shares = shamirs.shares(ElGamalKey.x.__int__(), quantity=share_num, modulus=ElGamalKey.p.__int__(), threshold=threshold)
         #print("shares:", shares)
         
         # privateKey = shamirs.interpolate(shares[5:15], threshold=10)
         # print("pk:", privateKey)
         # print("pk:", ElGamalKey.x)
         
-        return (ElGamalKey,shares)
+        return (ElGamalKey.y, ElGamalKey.x, ElGamalKey.p, ElGamalKey.g)
+
+    def get_shamirs_shares(self,threshold,share_num,sk,p):
+        shares = shamirs.shares(sk.__int__(), quantity=share_num, modulus=p.__int__(), threshold=threshold)
+        return shares
 
     def setup_digital_signature(self):
         signing_key = ECC.generate(curve='ed25519')

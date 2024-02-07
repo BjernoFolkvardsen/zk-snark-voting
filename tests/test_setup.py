@@ -1,11 +1,16 @@
 import unittest
 from src import setup
+from src.setup import SetupManager
 
 class TestSetup(unittest.TestCase):
 
-    def setUp(self):
-        # Code to setup before each test
-        pass
+    def test_elgamal_key_length(self,key_length):
+        setupManager = SetupManager()
+        (pk,sk,p,g) = self.setup_elgamal(key_length)
+        self.assertEqual(s.bit_length(), ['hello', 'world'])
+        # check that s.split fails when the separator is not a string
+        with self.assertRaises(TypeError):
+            s.split(2)
 
     def tearDown(self):
         # Code to cleanup after each test
