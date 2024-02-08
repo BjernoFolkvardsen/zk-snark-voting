@@ -5,3 +5,5 @@ pytest==7.4.3
 pycryptodome==3.20.0
 shamirs==2.1.0
 merkly==1.0.2
+zkpy==0.2.0
+parameterized==0.9.0
