@@ -35,6 +35,14 @@
       {
         "id": 2,
         "vote": "Obama"
+      },
+      {
+        "id": 3,
+        "vote": "Bush"
+      },
+      {
+        "id": 4,
+        "vote": "Clinton"
       }
     ],
   "votes": [

@@ -96,31 +96,47 @@ class BullitinBoard:
     def set_list_id_commitment(self, merkle_tree):
         with open("Data/data.json", "r") as file:
             data = json.load(file)
-        data["list-L"] = [list(item) for item in merkle_tree]
+        data["list_L"] = [list(item) for item in merkle_tree]
         with open("Data/data.json", "w") as file:
             json.dump(data, file, indent=2)
     
-    def get_list_id_commitment(self):
+    def get_list_id_commitment(self, id):
         with open("Data/data.json", "r") as file:
             data = json.load(file)
-        return data["list_L"]
+        for item in data["list_L"]:
+            if item[0] == id:
+                return item[1]
+        return None
 
     ## Merkle tree root
-    def set_merkletree_root(self,rt_L):
+    # def set_merkletree_root(self,rt_L):
+    #     with open("Data/data.json", "r") as file:
+    #         data = json.load(file)
+    #     data["merkletree_root"] = rt_L
+    #     with open("Data/data.json", "w") as file:
+    #         json.dump(data, file, indent=2)
+    #     pass
+    
+    # def get_merkletree_root(self):
+    #     with open("Data/data.json", "r") as file:
+    #         data = json.load(file)
+    #     return data["merkletree_root"]
+    
+    #Voting phase
+
+    ## Ballot
+
+    def get_candidates(self):
         with open("Data/data.json", "r") as file:
             data = json.load(file)
-        data["merkletree_root"] = rt_L
-        with open("Data/data.json", "w") as file:
-            json.dump(data, file, indent=2)
-        pass
-    
-    def get_merkletree_root(self):
-        with open("Data/data.json", "r") as file:
-            data = json.load(file)
-        return data["merkletree_root"]
-    
+        return data["candidates"]
 
-
+    def get_empty_ballot(self):
+        candidates = self.get_candidates()
+        ballot = {}
+        for candidate in candidates:
+            ballot[candidate["id"]] = 0
+        return ballot
 
 if __name__ == "__main__":
     bullitin_board = BullitinBoard()
@@ -132,7 +148,7 @@ if __name__ == "__main__":
     bullitin_board.set_voter_commitments("hej")
     bullitin_board.set_voters(1)
     bullitin_board.set_list_id_commitment([(1, "a"), (2, "b"), (3, "c")])
-    bullitin_board.set_merkletree_root(34567898765)
+    print(bullitin_board.get_list_id_commitment(2))
     print(bullitin_board.get_elgamal())
     print(bullitin_board.get_digital_signature())
     

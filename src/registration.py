@@ -1,5 +1,5 @@
 import uuid
-from src.setup import SetupManager
+from setup import SetupManager
 #from src.bulletinboard import BullitinBoard
 from merkly.mtree import MerkleTree
 from Crypto.Hash import SHA256, SHA512
@@ -96,6 +96,7 @@ class VoterRegistration:
         return(L, rt_L, sigma)
 
     def verify(self,rt_L, proof, id, c_id, L):
+        #self.bulletinboard.get_list_id_commitment(id)
         return (rt_L.verify(proof,SHA256.new(id.encode()+c_id.encode()).hexdigest()) == True) and ((id, c_id) in L)
 
 if __name__ == "__main__":

@@ -36,6 +36,14 @@
     {
       "id": 2,
       "vote": "Obama"
+    },
+    {
+      "id": 3,
+      "vote": "Bush"
+    },
+    {
+      "id": 4,
+      "vote": "Clinton"
     }
   ],
   "votes": [
@@ -71,7 +79,7 @@
   "voters": [
     1
   ],
-  "list-L": [
+  "list_L": [
     [
       1,
       "a"
@@ -84,6 +92,5 @@
       3,
       "c"
     ]
-  ],
-  "merkletree_root": 34567898765
+  ]
 }
