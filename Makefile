@@ -24,7 +24,7 @@ local-setup:
 	echo "\033[0;32mAll done. Happy coding!\033[0m"
 
 run:
-	python src/registration.py
+	python3 src/registration.py
 
 test:
 	pytest

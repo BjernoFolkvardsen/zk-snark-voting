@@ -18,10 +18,10 @@ class SetupManager:
         self.setup_digital_signature()
         m = b'Hello world!'
         (com,rand) = self.SHA_commit(m)
-        print(m)
-        print(com)
-        print(rand)
-        print(self.SHA_commit_verify(com,m,rand))
+        # print(m)
+        # print(com)
+        # print(rand)
+        # print(self.SHA_commit_verify(com,m,rand))
         #self.setup_zk_SNARK()
 
     def setup_elgamal(self,keysize):
@@ -50,14 +50,14 @@ class SetupManager:
         verification_key = eddsa.import_public_key(signing_key.public_key().export_key(format='raw'))
 
         # message = b'Hello, World!'
-        # message1 = b'Hello, World!'
+        # message1 = b'Hello, World!2'
         # signer = eddsa.new(signing_key, 'rfc8032')
         # verifier = eddsa.new(verification_key,'rfc8032')
         # h = signer.sign(message)
         # print(verifier.verify(message1,h))
         # print("sign: ", signer)
         # print("verify: ", verifier)
-        # print(DSS.DssSigScheme.can_sign(sign))
+        #print(DSS.DssSigScheme.can_sign(sign))
 
         return (signing_key,verification_key)
 
