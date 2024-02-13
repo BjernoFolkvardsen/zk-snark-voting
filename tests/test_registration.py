@@ -1,27 +1,31 @@
-# import unittest
-# from src import registration
+import unittest
+from src.registration import VoterRegistration
 
-# class TestRegistration(unittest.TestCase):
+class TestRegistration(unittest.TestCase):
 
-#     def setUp(self):
-#         # This method will be used to setup data for the tests
-#         pass
+    def test_register_voter(self):
+        reg = VoterRegistration()
+        (c_id, cr_id, t_id) = reg.register_voter('frederik')
+        (c_id1, cr_id1, t_id1) = reg.register_voter('frederik')
 
-#     def test_user_registration(self):
-#         # This method should test the user registration functionality
-#         pass
+        self.assertNotEqual(c_id, c_id1)
+        self.assertNotEqual(cr_id, cr_id1)
+        self.assertNotEqual(t_id, t_id1)
+    
+    def test_get_pseudonym(self):
+        reg = VoterRegistration()
+        pseudonym = reg.get_pseudonym('frederik')
+        pseudonym1 = reg.get_pseudonym('frederik')
+        self.assertNotEqual(pseudonym, pseudonym1)
+    
+    def test_register(self):
+        reg = VoterRegistration()
+        id = 'test_id'
+        c_id = 'test_c_id'
+        L = []
+        self.reg.register(id, c_id, L)
+        self.assertIn((id, c_id), L)
 
-#     def test_validation_of_user_data(self):
-#         # This method should test the validation of user data functionality
-#         pass
 
-#     def test_storing_user_data(self):
-#         # This method should test the storing user data functionality
-#         pass
-
-#     def tearDown(self):
-#         # This method will be used to cleanup after the tests
-#         pass
-
-# if __name__ == '__main__':
-#     unittest.main()
+if __name__ == '__main__':
+    unittest.main()

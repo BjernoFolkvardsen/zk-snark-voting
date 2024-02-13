@@ -1,5 +1,6 @@
 import uuid
-from setup import SetupManager
+from src.setup import SetupManager
+#from src.bulletinboard import BullitinBoard
 from merkly.mtree import MerkleTree
 from Crypto.Hash import SHA256, SHA512
 from Crypto.Signature import eddsa
@@ -7,6 +8,7 @@ from Crypto.Signature import eddsa
 class VoterRegistration:
     def __init__(self):
         self.setup = SetupManager()
+        #self.bulletinboard = BullitinBoard()
         pass
 
     def registration(self):
@@ -34,6 +36,8 @@ class VoterRegistration:
         # print("cr_id", cr_id)
         # print("t_id", t_id.hex())
         # print()
+
+        #self.bulletinboard.set_voter_commitments(c_id)
         return (c_id, cr_id, t_id)
 
     def get_pseudonym(self, value):
@@ -45,6 +49,8 @@ class VoterRegistration:
         #     pseudonyms.setdefault(name, str(uuid.uuid4())) for name in data
         # ]
         # print("cr_id ",pseudonym)
+        
+        #self.bulletinboard.set_voter_pseudonym(id, pseudonym)
         return pseudonym
 
     def register(self, id, c_id, L ):
@@ -81,10 +87,12 @@ class VoterRegistration:
         else :
             rt_L = None
             sigma = None
-        # print(rt_L)
+        print(rt_L)
 
         # print('σ signature: ', sigma)
-
+        
+        #self.bulletinboard.set_voters(id)
+        #self.bulletinboard.set_merkletree(L)
         return(L, rt_L, sigma)
 
     def verify(self,rt_L, proof, id, c_id, L):

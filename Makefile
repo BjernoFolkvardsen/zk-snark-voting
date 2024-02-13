@@ -11,7 +11,7 @@
 
 local-setup:
 	echo "\033[0;32mCreating python environment...\033[0m"
-	python3 -m venv . && source ./bin/activate
+# python3 -m venv . && source ./bin/activate
 	python3 --version
 	echo "\033[0;32mInstalling modules and dependencies...\033[0m"
 	pip install --upgrade pip
@@ -20,7 +20,7 @@ local-setup:
 	pip install -r requirements.txt
 
 	echo "\033[0;32mCreating the package...\033[0m"
-	pip install -e .
+# pip install -e .
 	echo "\033[0;32mAll done. Happy coding!\033[0m"
 
 run:

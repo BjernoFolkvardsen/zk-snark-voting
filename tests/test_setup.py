@@ -1,5 +1,6 @@
 import unittest
 from parameterized import parameterized
+from Crypto.Signature import eddsa
 import random 
 import shamirs
 from src.setup import SetupManager
@@ -24,18 +25,6 @@ class TestSetup(unittest.TestCase):
         (pk, sk, p, g) = setupManager.setup_elgamal(256)
         shares = setupManager.get_shamirs_shares(threshold, share_num, sk, p)
          
-        """
-        Tests that all shares are correctly generated
-        """
-        # self.assertEqual(shares.len(), share_num)
-
-        """
-        Tests that each share is a tuple of an int and byte
-        """
-        # for share in shares:
-        #   self.assertEqual(len(share), 2)
-        #   self.assertEqual(share[0], int) 
-        #   self.assertEqual(share[1], byte)
 
         """
         Tests that the reconstructed secret matches the original secret
@@ -44,6 +33,23 @@ class TestSetup(unittest.TestCase):
         reconstructed_sk = shamirs.interpolate(subset_shares, threshold=threshold)
 
         self.assertEqual(reconstructed_sk, sk)
+
+    def test_digital_signature(self):
+        setupManager = SetupManager()
+        (signing_key, verification_key) = setupManager.setup_digital_signature()
+        message = b'Hello, World!'
+        signer = eddsa.new(signing_key, 'rfc8032')
+        verifier = eddsa.new(verification_key,'rfc8032')
+        h = signer.sign(message)
+        self.assertEqual(verifier.verify(message,h), None)
+        with self.assertRaises(ValueError):
+            verifier.verify(b'Helo World', h)
+    
+    def test_SHA_commit(self):
+        setupManager = SetupManager()
+        m = b'Hello world!'
+        (com,rand) = setupManager.SHA_commit(m)
+        self.assertTrue(setupManager.SHA_commit_verify(com,m,rand))
 
 if __name__ == '__main__':
     unittest.main()

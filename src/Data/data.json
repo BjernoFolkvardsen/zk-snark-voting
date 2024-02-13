@@ -1,0 +1,89 @@
+{
+  "eligble_voters": [
+    {
+      "id": 1,
+      "name": "Frederik",
+      "cr_id": "3345678765"
+    },
+    {
+      "id": 2,
+      "name": "Isabella"
+    },
+    {
+      "id": 3,
+      "name": "Louise"
+    },
+    {
+      "id": 4,
+      "name": "Alberte"
+    }
+  ],
+  "registrars": [
+    {
+      "id": 1,
+      "name": "Hans"
+    },
+    {
+      "id": 2,
+      "name": "Grete"
+    }
+  ],
+  "candidates": [
+    {
+      "id": 1,
+      "vote": "Trump"
+    },
+    {
+      "id": 2,
+      "vote": "Obama"
+    }
+  ],
+  "votes": [
+    {
+      "voterId": 1,
+      "vote": 2
+    },
+    {
+      "voterId": 2,
+      "vote": 2
+    },
+    {
+      "voterId": 3,
+      "vote": 2
+    },
+    {
+      "voterId": 4,
+      "vote": 1
+    }
+  ],
+  "commitments": [
+    34567890,
+    "hej"
+  ],
+  "public_params": {
+    "elgamal": {
+      "public_key": "test",
+      "prime": 7,
+      "group": 42
+    },
+    "digital_signature_verification_key": "digital_signature_verification_key_test"
+  },
+  "voters": [
+    1
+  ],
+  "list-L": [
+    [
+      1,
+      "a"
+    ],
+    [
+      2,
+      "b"
+    ],
+    [
+      3,
+      "c"
+    ]
+  ],
+  "merkletree_root": 34567898765
+}
