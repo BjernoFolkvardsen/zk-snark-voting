@@ -1,5 +1,5 @@
 import uuid
-from setup import SetupManager
+from src.setup import SetupManager
 #from src.bulletinboard import BullitinBoard
 from merkly.mtree import MerkleTree
 from Crypto.Hash import SHA256, SHA512

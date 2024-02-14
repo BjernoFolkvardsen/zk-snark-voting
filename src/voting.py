@@ -1,8 +1,8 @@
 # from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import ElGamal
-from setup import SetupManager
-from registration import VoterRegistration
-from bulletinboard import BullitinBoard
+from src.setup import SetupManager
+from src.registration import VoterRegistration
+from src.bulletinboard import BullitinBoard
 class Voting:
     def __init__(self):
         self.setup = SetupManager()

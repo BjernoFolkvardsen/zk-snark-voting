@@ -127,7 +127,7 @@ class BullitinBoard:
     ## Ballot
 
     def get_candidates(self):
-        with open("Data/data.json", "r") as file:
+        with open("src/Data/data.json", "r") as file:
             data = json.load(file)
         return data["candidates"]
 
