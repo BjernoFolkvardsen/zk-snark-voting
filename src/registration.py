@@ -1,6 +1,6 @@
 import uuid
 from src.setup import SetupManager
-#from src.bulletinboard import BullitinBoard
+from src.bulletinboard import BullitinBoard
 from merkly.mtree import MerkleTree
 from Crypto.Hash import SHA256, SHA512
 from Crypto.Signature import eddsa
@@ -8,24 +8,28 @@ from Crypto.Signature import eddsa
 class VoterRegistration:
     def __init__(self):
         self.setup = SetupManager()
-        #self.bulletinboard = BullitinBoard()
+        self.bulletinboard = BullitinBoard()
         pass
 
     def registration(self):
+        eligible_voters = self.bulletinboard.get_eligible_voters()
+
+        for eligible_voter in eligible_voters:
+            (c_id, cr_id, t_id) = self.register_voter(eligible_voter["id"])
+            self.register(eligible_voter["id"],c_id)
+        
         # register_voter('frederik')
         # register_voter('isabella')
         # register_voter('fink')
         # register_voter(343)
-        (c_id, cr_id, t_id) = self.register_voter('frederik')
-        (L, rt_L, sigma) = self.register('frederik', c_id, [])
-        (c_id, cr_id, t_id) = self.register_voter('isabella')
-        (L, rt_L, sigma) = self.register('isabella', c_id, L)
-        (c_id, cr_id, t_id) = self.register_voter('bob')
-        (L, rt_L, sigma) = self.register('bob', c_id, L)
-        (c_id, cr_id, t_id) = self.register_voter('alice')
-        (L, rt_L, sigma) = self.register('alice', c_id, L)
-        (c_id, cr_id, t_id) = self.register_voter('charlie')
-        self.register('charlie', c_id, L)
+        # (c_id, cr_id, t_id) = self.register_voter('Frederik')
+        # (L, rt_L, sigma) = self.register('Frederik', c_id, [])
+        # (c_id, cr_id, t_id) = self.register_voter('Isabella')
+        # (L, rt_L, sigma) = self.register('Isabella', c_id, L)
+        # (c_id, cr_id, t_id) = self.register_voter('Louise')
+        # (L, rt_L, sigma) = self.register('Louise', c_id, L)
+        # (c_id, cr_id, t_id) = self.register_voter('Alberte')
+        # self.register('Alberte', c_id, L)
         
 
     def register_voter(self, id):
@@ -37,7 +41,7 @@ class VoterRegistration:
         # print("t_id", t_id.hex())
         # print()
 
-        #self.bulletinboard.set_voter_commitments(c_id)
+        self.bulletinboard.set_voter_commitments(c_id)
         return (c_id, cr_id, t_id)
 
     def get_pseudonym(self, value):
@@ -48,12 +52,11 @@ class VoterRegistration:
         # pseudonymized_data = [
         #     pseudonyms.setdefault(name, str(uuid.uuid4())) for name in data
         # ]
-        # print("cr_id ",pseudonym)
-        
-        #self.bulletinboard.set_voter_pseudonym(id, pseudonym)
+        self.bulletinboard.set_voter_pseudonym(value, pseudonym)
         return pseudonym
 
-    def register(self, id, c_id, L ):
+    def register(self, id, c_id):
+        L = self.bulletinboard.get_list_id_commitment()
         tuple = (id, c_id)
         L.insert(0, tuple)
         # print('The list after adding: ', str(L) )
@@ -76,29 +79,28 @@ class VoterRegistration:
             signer = eddsa.new(signing_key, 'rfc8032')
             sigma = signer.sign(message)
             for (idx,c_idx) in L:
-                print()
-                print(idx)
+                # print()
+                # print(idx)
                 proof = rt_L.proof(SHA256.new(idx.encode()+c_idx.encode()).hexdigest())
-                print("proof: ", proof)
-                print("verify: ", self.verify(rt_L,proof,idx,c_idx, L))
-            print()
-            print()
-            print()
+            #     print("proof: ", proof)
+            #     print("verify: ", self.verify(rt_L,proof,idx,c_idx, L))
+            # print()
+            # print()
+            # print()
         else :
             rt_L = None
             sigma = None
-        print(rt_L)
+        # print(rt_L)
 
         # print('σ signature: ', sigma)
         
-        #self.bulletinboard.set_voters(id)
-        #self.bulletinboard.set_merkletree(L)
+        self.bulletinboard.set_voters(id)
+        self.bulletinboard.set_list_id_commitment(L)
         return(L, rt_L, sigma)
 
     def verify(self,rt_L, proof, id, c_id, L):
-        #self.bulletinboard.get_list_id_commitment(id)
         return (rt_L.verify(proof,SHA256.new(id.encode()+c_id.encode()).hexdigest()) == True) and ((id, c_id) in L)
 
-if __name__ == "__main__":
-    registration_manager = VoterRegistration()
-    registration_manager.registration()
+# if __name__ == "__main__":
+#     registration_manager = VoterRegistration()
+#     registration_manager.registration()

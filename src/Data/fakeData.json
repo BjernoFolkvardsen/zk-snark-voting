@@ -1,30 +1,20 @@
 {
-  "eligble_voters": [
+  "eligible_voters": [
     {
-      "id": 1,
-      "name": "Frederik"
+      
+      "id": "Frederik"
     },
     {
-      "id": 2,
-      "name": "Isabella"
+      
+      "id": "Isabella"
     },
     {
-      "id": 3,
-      "name": "Louise"
+  
+      "id": "Louise"
     },
     {
-      "id": 4,
-      "name": "Alberte"
-    }
-  ],
-  "registrars": [
-    {
-      "id": 1,
-      "name": "Hans"
-    },
-    {
-      "id": 2,
-      "name": "Grete"
+    
+      "id": "Alberte"
     }
   ],
   "candidates": [
@@ -47,24 +37,21 @@
     ],
   "votes": [
     {
-      "voterId": 1,
+      "voterId": "Frederik",
       "vote": 2
     },
     {
-      "voterId": 2,
+      "voterId": "Isabella",
+      "vote": 4
+    },
+    {
+      "voterId": "Louise",
       "vote": 2
     },
     {
-      "voterId": 3,
-      "vote": 2
-    },
-    {
-      "voterId": 4,
-      "vote": 1
+      "voterId": "Alberte",
+      "vote": 3
     }
-  ],
-  "commitments": [
-
   ],
   "public_params": {
     "elgamal": {},

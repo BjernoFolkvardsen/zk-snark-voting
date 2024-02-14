@@ -4,12 +4,14 @@ from Crypto.Signature import eddsa
 from Crypto.Hash import SHA256
 from zkpy.ptau import PTau
 from zkpy.circuit import Circuit, GROTH
+from src.bulletinboard import BullitinBoard
 import os
 #import subprocess
 import shamirs
 
 class SetupManager:
     def __init__(self):
+        self.bulletinboard = BullitinBoard()
         pass 
     
     def setup(self):
@@ -38,7 +40,8 @@ class SetupManager:
         # privateKey = shamirs.interpolate(shares[5:15], threshold=10)
         # print("pk:", privateKey)
         # print("pk:", ElGamalKey.x)
-        
+
+        self.bulletinboard.set_elgamal(ElGamalKey.y.__int__(), ElGamalKey.p.__int__(), ElGamalKey.g.__int__())
         return (ElGamalKey.y, ElGamalKey.x, ElGamalKey.p, ElGamalKey.g)
 
     def get_shamirs_shares(self,threshold,share_num,sk,p):
@@ -59,6 +62,7 @@ class SetupManager:
         # print("verify: ", verifier)
         #print(DSS.DssSigScheme.can_sign(sign))
 
+        self.bulletinboard.set_digital_signature(verification_key.export_key(format='OpenSSH'))
         return (signing_key,verification_key)
 
     def SHA_commit(self,m):
@@ -109,6 +113,6 @@ class SetupManager:
         circuit.verify(GROTH, vkey_file=working_dir+"vkey.json", public_file=working_dir+"public.json", proof_file=working_dir+"proof.json")
 
 
-if __name__ == "__main__":
-    setup_manager = SetupManager()
-    setup_manager.setup()
+# if __name__ == "__main__":
+#     setup_manager = SetupManager()
+#     setup_manager.setup()
