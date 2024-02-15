@@ -15,41 +15,74 @@
     {
     
       "id": "Alberte"
+    },
+    {
+  
+      "id": "Frank"
+    },
+    {
+    
+      "id": "Anne"
+    },
+    {
+  
+      "id": "Grete"
+    },
+    {
+    
+      "id": "Kaj"
     }
+    
   ],
   "candidates": [
       {
+        "id": 0,
+        "candidate": "Trump"
+      },
+      {
         "id": 1,
-        "vote": "Trump"
+        "candidate": "Obama"
       },
       {
         "id": 2,
-        "vote": "Obama"
+        "candidate": "Bush"
       },
       {
         "id": 3,
-        "vote": "Bush"
-      },
-      {
-        "id": 4,
-        "vote": "Clinton"
+        "candidate": "Clinton"
       }
     ],
   "votes": [
     {
       "voterId": "Frederik",
-      "vote": 2
+      "vote": 1
     },
     {
       "voterId": "Isabella",
-      "vote": 4
-    },
-    {
-      "voterId": "Louise",
       "vote": 2
     },
     {
+      "voterId": "Louise",
+      "vote": 3
+    },
+    {
       "voterId": "Alberte",
+      "vote": 2
+    },
+    {
+      "voterId": "Frank",
+      "vote": 1
+    },
+    {
+      "voterId": "Anne",
+      "vote": 2
+    },
+    {
+      "voterId": "Grete",
+      "vote": 1
+    },
+    {
+      "voterId": "Kaj",
       "vote": 3
     }
   ],

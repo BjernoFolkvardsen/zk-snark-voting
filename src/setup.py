@@ -1,17 +1,16 @@
 from Crypto.PublicKey import ElGamal, ECC
 from Crypto.Random import get_random_bytes
 from Crypto.Signature import eddsa
-from Crypto.Hash import SHA256
 from zkpy.ptau import PTau
 from zkpy.circuit import Circuit, GROTH
 from src.bulletinboard import BullitinBoard
+from src.utility import Utility
 import os
 #import subprocess
 import shamirs
 
 class SetupManager:
     def __init__(self):
-        self.bulletinboard = BullitinBoard()
         pass 
     
     def setup(self):
@@ -19,11 +18,11 @@ class SetupManager:
         shares = self.get_shamirs_shares(10,20,sk,p)
         self.setup_digital_signature()
         m = b'Hello world!'
-        (com,rand) = self.SHA_commit(m)
+        (com,rand) = Utility.SHA_commit(m)
         # print(m)
         # print(com)
         # print(rand)
-        # print(self.SHA_commit_verify(com,m,rand))
+        # print(Utility.SHA_commit_verify(com,m,rand))
         #self.setup_zk_SNARK()
 
     def setup_elgamal(self,keysize):
@@ -41,7 +40,8 @@ class SetupManager:
         # print("pk:", privateKey)
         # print("pk:", ElGamalKey.x)
 
-        self.bulletinboard.set_elgamal(ElGamalKey.y.__int__(), ElGamalKey.p.__int__(), ElGamalKey.g.__int__())
+        BullitinBoard.set_elgamal(ElGamalKey.y.__int__(), ElGamalKey.p.__int__(), ElGamalKey.g.__int__())
+        BullitinBoard.set_private_param("elgamal_priv_key", ElGamalKey.x.__int__())
         return (ElGamalKey.y, ElGamalKey.x, ElGamalKey.p, ElGamalKey.g)
 
     def get_shamirs_shares(self,threshold,share_num,sk,p):
@@ -62,17 +62,9 @@ class SetupManager:
         # print("verify: ", verifier)
         #print(DSS.DssSigScheme.can_sign(sign))
 
-        self.bulletinboard.set_digital_signature(verification_key.export_key(format='OpenSSH'))
-        return (signing_key,verification_key)
-
-    def SHA_commit(self,m):
-        random = get_random_bytes(256)
-        commitment = SHA256.new(random+m)
-        return (commitment.hexdigest(),random)
-
-    def SHA_commit_verify(self,com,m,key):
-        return com == SHA256.new(key+m).hexdigest()
-        
+        BullitinBoard.set_digital_signature(verification_key.export_key(format='OpenSSH'))
+        BullitinBoard.set_private_param("signing_key", signing_key.export_key(format='PEM'))
+        return (signing_key,verification_key)        
 
     def setup_zk_SNARK(self):
         working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circom4/"

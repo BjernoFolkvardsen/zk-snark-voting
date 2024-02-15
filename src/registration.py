@@ -1,18 +1,17 @@
 import uuid
-from src.setup import SetupManager
 from src.bulletinboard import BullitinBoard
 from merkly.mtree import MerkleTree
 from Crypto.Hash import SHA256, SHA512
 from Crypto.Signature import eddsa
+from Crypto.PublicKey import ECC
+from src.utility import Utility
 
 class VoterRegistration:
     def __init__(self):
-        self.setup = SetupManager()
-        self.bulletinboard = BullitinBoard()
         pass
 
     def registration(self):
-        eligible_voters = self.bulletinboard.get_eligible_voters()
+        eligible_voters = BullitinBoard.get_eligible_voters()
 
         for eligible_voter in eligible_voters:
             (c_id, cr_id, t_id) = self.register_voter(eligible_voter["id"])
@@ -34,14 +33,14 @@ class VoterRegistration:
 
     def register_voter(self, id):
         cr_id = self.get_pseudonym(id)
-        (c_id,t_id) = self.setup.SHA_commit(cr_id.encode())
+        (c_id,t_id) = Utility.SHA_commit(cr_id.encode())
         # print("id", id)
         # print("c_id", c_id)
         # print("cr_id", cr_id)
         # print("t_id", t_id.hex())
         # print()
 
-        self.bulletinboard.set_voter_commitments(c_id)
+        BullitinBoard.set_voter_commitments(c_id)
         return (c_id, cr_id, t_id)
 
     def get_pseudonym(self, value):
@@ -52,11 +51,11 @@ class VoterRegistration:
         # pseudonymized_data = [
         #     pseudonyms.setdefault(name, str(uuid.uuid4())) for name in data
         # ]
-        self.bulletinboard.set_voter_pseudonym(value, pseudonym)
+        BullitinBoard.set_voter_pseudonym(value, pseudonym)
         return pseudonym
 
     def register(self, id, c_id):
-        L = self.bulletinboard.get_list_id_commitment()
+        L = BullitinBoard.get_list_id_commitment()
         tuple = (id, c_id)
         L.insert(0, tuple)
         # print('The list after adding: ', str(L) )
@@ -65,7 +64,7 @@ class VoterRegistration:
             for (idx,c_idx) in L:
                 l.insert(0,SHA256.new(idx.encode()+c_idx.encode()).hexdigest())
             rt_L = MerkleTree(l)
-            (signing_key, verification_key) = self.setup.setup_digital_signature()
+            signing_key = ECC.import_key(BullitinBoard.get_private_param("signing_key"))
             # Creating byte array for list l and merkle tree root combined
             l_rt_L_bytes = bytearray()
             # Add all elements of l to byte array
@@ -94,8 +93,8 @@ class VoterRegistration:
 
         # print('σ signature: ', sigma)
         
-        self.bulletinboard.set_voters(id)
-        self.bulletinboard.set_list_id_commitment(L)
+        BullitinBoard.set_voters(id)
+        BullitinBoard.set_list_id_commitment(L)
         return(L, rt_L, sigma)
 
     def verify(self,rt_L, proof, id, c_id, L):
