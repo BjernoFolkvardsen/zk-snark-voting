@@ -12,19 +12,19 @@
 local-setup:
 	echo "\033[0;32mCreating python environment...\033[0m"
 # python3 -m venv . && source ./bin/activate
-	python3 --version
+	python3.10 --version
 	echo "\033[0;32mInstalling modules and dependencies...\033[0m"
-	pip install --upgrade pip
-	pip --version
-	pip install --upgrade pip setuptools
-	pip install -r requirements.txt
+	pip3.10 install --upgrade pip
+	pip3.10 --version
+	pip3.10 install --upgrade pip setuptools
+	pip3.10 install -r requirements.txt
 
 	echo "\033[0;32mCreating the package...\033[0m"
 # pip install -e .
 	echo "\033[0;32mAll done. Happy coding!\033[0m"
 
 run:
-	python3 src/registration.py
+	python3.10 app.py
 
 test:
 	pytest
