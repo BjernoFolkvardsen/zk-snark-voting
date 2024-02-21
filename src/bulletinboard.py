@@ -36,7 +36,6 @@ class BullitinBoard:
         data = BullitinBoard.get_data()
         return data["private_params"][name]
 
-    # Setup Phase
     ## Digital Signatures
     @staticmethod
     def set_digital_signature(verification_key):
@@ -65,7 +64,6 @@ class BullitinBoard:
         data = BullitinBoard.get_data()
         return data["public_params"]["elgamal"]
 
-    # Registration Phase
     ## Get voters
     @staticmethod
     def get_eligible_voters():
@@ -100,6 +98,17 @@ class BullitinBoard:
         data = BullitinBoard.get_data()
         return data["commitments"]
     
+    ##zk-SNARK
+    @staticmethod
+    def set_zkey_file_name(zkey_file_name):
+        data = BullitinBoard.get_data()
+        data["zkey_file_name"] = zkey_file_name
+        BullitinBoard.set_data(data)
+
+    @staticmethod
+    def get_zkey_file_name():
+        data = BullitinBoard.get_data()
+        return data["zkey_file_name"]
     
     ## List of voters
     @staticmethod
@@ -117,9 +126,9 @@ class BullitinBoard:
     
     ## List of commitment and id (L)
     @staticmethod
-    def set_list_id_commitment(merkle_tree):
+    def set_list_id_commitment(L):
         data = BullitinBoard.get_data()
-        data["list_L"] = [list(item) for item in merkle_tree]
+        data["list_L"] = L
         BullitinBoard.set_data(data)
     
     @staticmethod
@@ -144,9 +153,6 @@ class BullitinBoard:
     #     with open(BullitinBoard.path, "r") as file:
     #         data = json.load(file)
     #     return data["merkletree_root"]
-    
-    #Voting phase
-
     
     ## Get voters votes
     @staticmethod
@@ -182,8 +188,6 @@ class BullitinBoard:
     def get_ballot_by_cr_id(cr_id):
         data = BullitinBoard.get_data()
         return data["ballots"][cr_id]
-
-    # Tally
 
     ## Final ballots
     @staticmethod

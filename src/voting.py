@@ -1,7 +1,9 @@
 from Crypto.PublicKey import ElGamal
 from src.bulletinboard import BullitinBoard
 from src.utility import Utility
+from zkpy.circuit import Circuit, GROTH
 import random
+import os
 class Voting:
     def __init__(self):
         pass
@@ -66,3 +68,20 @@ class Voting:
         return (ballot, selected_cr_id)
 
 
+    def zk_snark(self):
+        zkey_file_name = BullitinBoard.get_zkey_file_name()
+        working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/TestCircuit/"
+        js_dir = working_dir+"circuit_js/"
+        circuit = Circuit("circuit.circom", working_dir=working_dir,output_dir=working_dir, r1cs=None, js_dir=js_dir,
+        wasm=js_dir+"circuit.wasm",
+        witness=working_dir+"witness.wtns",
+        zkey= zkey_file_name,
+        vkey= working_dir+"vkey.json")
+
+        circuit.gen_witness(working_dir+"input.json")
+
+        circuit.prove(GROTH)
+
+        circuit.export_vkey(output_file=working_dir+"vkey.json")
+
+        circuit.verify(GROTH, vkey_file=working_dir+"vkey.json", public_file=working_dir+"public.json", proof_file=working_dir+"proof.json")

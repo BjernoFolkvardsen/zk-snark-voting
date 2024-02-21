@@ -56,31 +56,29 @@ class VoterRegistration:
 
     def register(self, id, c_id):
         L = BullitinBoard.get_list_id_commitment()
-        tuple = (id, c_id)
-        L.insert(0, tuple)
-        # print('The list after adding: ', str(L) )
+        L.insert(0, id + "|" + c_id)
+
+        # If length of list L is less than 3 don't make merkle tree
         if len(L) > 2 :
-            l = []
-            for (idx,c_idx) in L:
-                l.insert(0,SHA256.new(idx.encode()+c_idx.encode()).hexdigest())
-            rt_L = MerkleTree(l)
+            rt_L = MerkleTree(L)
             signing_key = ECC.import_key(BullitinBoard.get_private_param("signing_key"))
+
             # Creating byte array for list l and merkle tree root combined
             l_rt_L_bytes = bytearray()
             # Add all elements of l to byte array
-            for elem in l:
+            for elem in L:
                 l_rt_L_bytes.extend(bytearray(elem.encode()))
             # Add all leaves from merkle tree root to byte array
             for elem in rt_L.leaves:
                 l_rt_L_bytes.extend(bytearray(elem))
-                
-            message = SHA512.new(l_rt_L_bytes)
+            
+            # message = SHA512.new(l_rt_L_bytes)
             signer = eddsa.new(signing_key, 'rfc8032')
-            sigma = signer.sign(message)
-            for (idx,c_idx) in L:
-                # print()
-                # print(idx)
-                proof = rt_L.proof(SHA256.new(idx.encode()+c_idx.encode()).hexdigest())
+            sigma = signer.sign(bytes(l_rt_L_bytes))
+            # for value in L:
+            #     # print()
+            #     # print(idx)
+            #     proof = rt_L.proof(value)
             #     print("proof: ", proof)
             #     print("verify: ", self.verify(rt_L,proof,idx,c_idx, L))
             # print()

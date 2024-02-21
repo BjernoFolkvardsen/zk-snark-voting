@@ -67,7 +67,7 @@ class SetupManager:
         return (signing_key,verification_key)        
 
     def setup_zk_SNARK(self):
-        working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circom4/"
+        working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/TestCircuit/"
         ptau = PTau(working_dir=working_dir)
         ptau.start(constraints='15')
         ptau.contribute()
@@ -85,26 +85,25 @@ class SetupManager:
         #     witness (str, optional): Optional path to a witness file.
         #     zkey (str, optional): Optional path to a pre-generated zkey file.
         #     vkey (str, optional): Optional path to a pre-generated verification key file.
+
         circuit = Circuit("circuit.circom", working_dir=working_dir,output_dir=working_dir)
+
         circuit.compile()
+
         circuit.get_info()
+
         circuit.print_constraints()
-        circuit.gen_witness(working_dir+"input.json")
-        # proc = subprocess.run(
-        #         ["snarkjs", "plonk", "setup", working_dir+"circuit.r1cs", ptau.ptau_file, working_dir+"key.zkey"],
-        #         shell=True,
-        #         capture_output=True,
-        #         cwd=working_dir,
-        #         check=True,
-        # )
-        # print(proc.stdout.decode('utf-8'))
+
+        # circuit.gen_witness(working_dir+"input.json")
+     
         circuit.setup(GROTH, ptau)
+
         circuit.contribute_phase2(entropy="p1")
-        circuit.prove(GROTH)
-        circuit.export_vkey(output_file=working_dir+"vkey.json")
-        circuit.verify(GROTH, vkey_file=working_dir+"vkey.json", public_file=working_dir+"public.json", proof_file=working_dir+"proof.json")
+        print(circuit.zkey_file)
+        BullitinBoard.set_zkey_file_name(circuit.zkey_file)
 
+        # circuit.prove(GROTH)
 
-# if __name__ == "__main__":
-#     setup_manager = SetupManager()
-#     setup_manager.setup()
+        # circuit.export_vkey(output_file=working_dir+"vkey.json")
+
+        # circuit.verify(GROTH, vkey_file=working_dir+"vkey.json", public_file=working_dir+"public.json", proof_file=working_dir+"proof.json")
