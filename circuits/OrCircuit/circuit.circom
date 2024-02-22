@@ -24,16 +24,16 @@ template OrCircuit(){
     signal input a;
     signal input b;
     signal input c;
-    signal output out
+    signal output out;
 
     component mult = Multiplier2;
     component isBin = isBinary;
 
-    mult.in1 <== a
-    mult.in2 <== b
-    isBin.in <== c
+    mult.in1 <== a;
+    mult.in2 <== b;
+    isBin.in <== c;
 
-    multIs20 <== mult.out === 20
-    out <== isBin.out || multIs20
+    multIs20 <== mult.out === 20;
+    out <== isBin.out || multIs20;
 }
 component main = OrCircuit();
