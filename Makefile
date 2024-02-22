@@ -29,6 +29,12 @@ run:
 test:
 	pytest
 
+clearNullVote:
+	rm -rf circuits/FullCircuit/NullVote_js/
+	rm -rf circuits/FullCircuit/*.zkey
+	rm circuits/FullCircuit/NullVote.r1cs
+	rm circuits/FullCircuit/NullVote.sym
+	rm circuits/FullCircuit/witness.wtns
 
 # virtualenv --python=python3.5 .venv
 # source .venv/bin/activate

@@ -98,6 +98,3 @@ class VoterRegistration:
     def verify(self,rt_L, proof, id, c_id, L):
         return (rt_L.verify(proof,SHA256.new(id.encode()+c_id.encode()).hexdigest()) == True) and ((id, c_id) in L)
 
-# if __name__ == "__main__":
-#     registration_manager = VoterRegistration()
-#     registration_manager.registration()

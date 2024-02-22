@@ -1,0 +1,13 @@
+1,1,1,main.ev1
+2,2,1,main.ev2
+3,3,1,main.pk_t
+4,4,1,main.g
+5,-1,1,main.e_v[0]
+6,-1,1,main.e_v[1]
+7,-1,1,main.r
+8,5,1,main.dummy
+9,-1,0,main.encrypt.c1
+10,-1,0,main.encrypt.c2
+11,-1,0,main.encrypt.r
+12,-1,0,main.encrypt.g
+13,-1,0,main.encrypt.y

@@ -67,12 +67,14 @@ class SetupManager:
         return (signing_key,verification_key)        
 
     def setup_zk_SNARK(self):
-        working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/TestCircuit/"
-        ptau = PTau(working_dir=working_dir)
-        ptau.start(constraints='15')
-        ptau.contribute()
-        ptau.beacon()
-        ptau.prep_phase2()
+        working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/FullCircuit/"
+        # ptau = PTau(working_dir=working_dir)
+        # ptau.start(constraints='15')
+        # ptau.contribute()
+        # ptau.beacon()
+        # ptau.prep_phase2()
+
+        ptau = PTau(ptau_file=working_dir+"../ptau_15.ptau")
 
         # Args:
         #     circ_file (str): Path to a circom circuit file.
@@ -86,7 +88,7 @@ class SetupManager:
         #     zkey (str, optional): Optional path to a pre-generated zkey file.
         #     vkey (str, optional): Optional path to a pre-generated verification key file.
 
-        circuit = Circuit("circuit.circom", working_dir=working_dir,output_dir=working_dir)
+        circuit = Circuit("NullVote.circom", working_dir=working_dir,output_dir=working_dir)
 
         circuit.compile()
 
@@ -98,7 +100,7 @@ class SetupManager:
      
         circuit.setup(GROTH, ptau)
 
-        circuit.contribute_phase2(entropy="p1")
+        circuit.contribute_phase2(entropy="p1", output_file=working_dir+"final.zkey")
         print(circuit.zkey_file)
         BullitinBoard.set_zkey_file_name(circuit.zkey_file)
 

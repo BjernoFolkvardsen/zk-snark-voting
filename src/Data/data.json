@@ -1,36 +1,28 @@
 {
   "eligible_voters": [
     {
-      "id": "Frederik",
-      "cr_id": "d6664456-0bd6-4046-8bce-0d44f896710e"
+      "id": "Frederik"
     },
     {
-      "id": "Isabella",
-      "cr_id": "94c983e2-620e-4e04-bae8-cac5efae9df7"
+      "id": "Isabella"
     },
     {
-      "id": "Louise",
-      "cr_id": "4decc289-1723-4b62-952c-077fd166099d"
+      "id": "Louise"
     },
     {
-      "id": "Alberte",
-      "cr_id": "f985279c-fd57-4b2c-8851-9c4a7caa7778"
+      "id": "Alberte"
     },
     {
-      "id": "Frank",
-      "cr_id": "5394bb6e-674c-426e-8b21-829380d29316"
+      "id": "Frank"
     },
     {
-      "id": "Anne",
-      "cr_id": "dac85a88-fea7-467f-99dd-f9e8a54f33c1"
+      "id": "Anne"
     },
     {
-      "id": "Grete",
-      "cr_id": "50878c47-62b6-49f5-a41b-aa7635c7588e"
+      "id": "Grete"
     },
     {
-      "id": "Kaj",
-      "cr_id": "45659b01-9608-46f5-ae38-118ed42a428b"
+      "id": "Kaj"
     }
   ],
   "candidates": [
@@ -86,45 +78,8 @@
     }
   ],
   "public_params": {
-    "elgamal": {
-      "public_key": 18727699282406414349689717534118567120307062195914694808020309345096371414335,
-      "prime": 61291734698807346325318233122695268806960363609431592798338006509617709145839,
-      "group": 42620929610427203425183342934055088518185848852227962324912588831777341871395
-    },
-    "digital_signature_verification_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPle1awlTV6JDJEwwcJJwLeOOwei2t/nemo+2g8rjBti\n"
+    "elgamal": {},
+    "digital_signature_verification_key": ""
   },
-  "private_params": {
-    "elgamal_priv_key": 36480735507320240538252952089104775333645410819682532258283111763657121206332,
-    "signing_key": "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIOeI6iRThXZ1vWuIVVfj+CU5vk74lRRJk6+D1AFLaVb3\n-----END PRIVATE KEY-----"
-  },
-  "commitments": [
-    "f25463957ca4d31226ee57a62cfd756a3223bbf51bb42687e89dd223906cd013",
-    "b28f7e74d2f9bfbd2fd241fef8a19465800175e3fb8cc1db555c7db707a9a78e",
-    "c672754277c65dd5151c1c9c23bd700ca06dd6e710f6c938e7e4cfdfd74fb87a",
-    "5e160c22bd71db27517d56536e04ff42d73464808a02d6e2ae9f60e672a678a8",
-    "8ef692750bb13a5c2d61ccd6d22716228ddc3b523c0483153cecce5163217a91",
-    "0edecccce603ba9ac165c2012b03a9c8d4d7ae443c9c4298e2fa3521b473faa4",
-    "a2b1b6b7bb467c11f73e144b0dd95129df2d3f52464ba4533baa4362521fc71d",
-    "6bec79fcfe3d6da02193f1cce47dc7fabda3be339a7741b12aaed99589308153"
-  ],
-  "voters": [
-    "Frederik",
-    "Isabella",
-    "Louise",
-    "Alberte",
-    "Frank",
-    "Anne",
-    "Grete",
-    "Kaj"
-  ],
-  "list_L": [
-    "Kaj|6bec79fcfe3d6da02193f1cce47dc7fabda3be339a7741b12aaed99589308153",
-    "Grete|a2b1b6b7bb467c11f73e144b0dd95129df2d3f52464ba4533baa4362521fc71d",
-    "Anne|0edecccce603ba9ac165c2012b03a9c8d4d7ae443c9c4298e2fa3521b473faa4",
-    "Frank|8ef692750bb13a5c2d61ccd6d22716228ddc3b523c0483153cecce5163217a91",
-    "Alberte|5e160c22bd71db27517d56536e04ff42d73464808a02d6e2ae9f60e672a678a8",
-    "Louise|c672754277c65dd5151c1c9c23bd700ca06dd6e710f6c938e7e4cfdfd74fb87a",
-    "Isabella|b28f7e74d2f9bfbd2fd241fef8a19465800175e3fb8cc1db555c7db707a9a78e",
-    "Frederik|f25463957ca4d31226ee57a62cfd756a3223bbf51bb42687e89dd223906cd013"
-  ]
+  "zkey_file_name": "/Users/dkIsDrRa/zk-snark-voting/src/../circuits/FullCircuit/final.zkey"
 }
