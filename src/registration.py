@@ -32,21 +32,21 @@ class VoterRegistration:
         
 
     def register_voter(self, id):
-        cr_id = self.get_pseudonym(id)
-        (c_id,t_id) = Utility.SHA_commit(cr_id.encode())
+        cr_id = int(self.get_pseudonym(id), 16)
+        (c_id,t_id) = Utility.SHA_commit(cr_id)
         # print("id", id)
         # print("c_id", c_id)
         # print("cr_id", cr_id)
         # print("t_id", t_id.hex())
         # print()
-
+        c_id = int(c_id, 16)
         BullitinBoard.set_voter_commitments(c_id)
         return (c_id, cr_id, t_id)
 
     def get_pseudonym(self, value):
         # pseudonyms = {}
         # Pseudonymize the data
-        pseudonym = str(uuid.uuid4())
+        pseudonym = uuid.uuid4().hex
         # pseudonyms.setdefault(name, str(uuid.uuid4()))
         # pseudonymized_data = [
         #     pseudonyms.setdefault(name, str(uuid.uuid4())) for name in data

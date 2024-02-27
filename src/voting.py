@@ -1,5 +1,6 @@
 from Crypto.PublicKey import ElGamal
 from src.bulletinboard import BullitinBoard
+from src.registration import VoterRegistration
 from src.utility import Utility
 from zkpy.circuit import Circuit, GROTH
 import random
@@ -72,27 +73,35 @@ class Voting:
 
     def zk_snark(self):
         zkey_file_name = BullitinBoard.get_zkey_file_name()
-        working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/FullCircuit/"
-        js_dir = working_dir+"NullVote_js/"
-        circuit = Circuit("NullVote.circom", working_dir=working_dir,output_dir=working_dir, r1cs=None, js_dir=js_dir,
-        wasm=js_dir+"NullVote.wasm",
+        working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/HashCircuit/"
+        js_dir = working_dir+"circuit_js/"
+        circuit = Circuit("circuit.circom", working_dir=working_dir,output_dir=working_dir, r1cs=None, js_dir=js_dir,
+        wasm=js_dir+"circuit.wasm",
         witness=working_dir+"witness.wtns",
         zkey= zkey_file_name,
         vkey= working_dir+"vkey.json")
 
-        ElGamalKey = Utility.generateElGamalKey(256, get_random_bytes)
-        (pk,sk,p,g) = (ElGamalKey.y.__int__(), ElGamalKey.x.__int__(), ElGamalKey.p.__int__(), ElGamalKey.g.__int__())
-        print("p: ", p)
-        r = random.randint(1, p-2)
-        null_vote = Utility.encrypt(0,r, g, p, pk)
+        ## VOTE INPUT
+        # ElGamalKey = Utility.generateElGamalKey(256, get_random_bytes)
+        # (pk,sk,p,g) = (ElGamalKey.y.__int__(), ElGamalKey.x.__int__(), ElGamalKey.p.__int__(), ElGamalKey.g.__int__())
+        # print("p: ", p)
+        # r = random.randint(1, p-2)
+        # v = 0
+        # null_vote = Utility.encrypt(v,r, g, p, pk)
 
-        inputs = {"pk_t":pk, "g":g, "e_v":[null_vote[0],null_vote[1]], "r":r }
+        # inputs = {"pk_t":pk, "g":g, "e_v":[null_vote[0],null_vote[1]], "r":r, "v":v }
         # with open('circuits/FullCircuit/input.json', 'w') as f:
         #     json.dump(inputs, f)
-        print("inputs:", inputs)
-        print("zkey_file_name: ", zkey_file_name)
+        # print("inputs:", inputs)
+        # print("zkey_file_name: ", zkey_file_name)
         # print("inputs_json:", json.dumps(inputs))
         # inputs_json = json.dumps(inputs)
+
+        ## COMMIT INPUT
+        registration_manager = VoterRegistration()
+        (c_id, cr_id, t_id) = registration_manager.register_voter('Frederik')
+        inputs = { "c_id":c_id, "cr_id":cr_id, "t_id":t_id }
+        print("inputs:", inputs)
 
         circuit.gen_witness(working_dir+"input.json")
 

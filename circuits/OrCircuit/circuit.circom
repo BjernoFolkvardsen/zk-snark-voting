@@ -6,7 +6,7 @@ template isBinary () {
    signal output out;
 
    //Statements.
-   out <== in * (in-1) === 0;
+   out <== in * (in-1);
 }
 
 template Multiplier2 () {
@@ -14,26 +14,28 @@ template Multiplier2 () {
    // Declaration of signals.
    signal input in1;
    signal input in2;
-   signal output c;
+   signal output out;
 
    // Constraints.
-   c <== in1 * in2;
+   out <== in1 * in2;
 }
 
 template OrCircuit(){
-    signal input a;
-    signal input b;
-    signal input c;
-    signal output out;
+   signal input a;
+   signal input b;
+   signal input c;
+   signal output out;
 
-    component mult = Multiplier2;
-    component isBin = isBinary;
+   component mult = Multiplier2();
+   component isBin = isBinary();
 
-    mult.in1 <== a;
-    mult.in2 <== b;
-    isBin.in <== c;
+   mult.in1 <== a;
+   mult.in2 <== b;
+   isBin.in <== c;
 
-    multIs20 <== mult.out === 20;
-    out <== isBin.out || multIs20;
+   var multIs20 = mult.out == 20 ? 1 : 0;
+   var isBinary = isBin.out == 0 ? 1 : 0;
+   out <-- isBinary || multIs20 ? 1 : 0;
+   out === 1;
 }
 component main = OrCircuit();

@@ -12,6 +12,10 @@ tests/__pycache__/
 *.py[cod]
 *$py.class
 
+# Circom
+circuit.cpp/
+circuit_js/
+
 # C extensions
 *.so
 

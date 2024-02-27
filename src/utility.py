@@ -1,9 +1,13 @@
-from Crypto.Random import get_random_bytes
+from Crypto.Random.random import getrandbits
 from Crypto.Hash import SHA256
 from Crypto.PublicKey import ElGamal
 from Crypto.Math.Numbers import Integer
 from Crypto.Math._IntegerCustom import IntegerCustom
+from Crypto.Hash import SHA256
 
+# Used to allow use of circom. See: https://docs.circom.io/circom-language/basic-operators/#field-elements
+GLOBAL_FIELD_P = 21888242871839275222246405745257275088548364400416034343698204186575808495617 # BN128
+# GLOBAL_FIELD_P = 115792089210356248762697446949407573530086143415290314195533631308867097853951 # SECQ256R1
 
 class CouldNotDecrypt(Exception):
     """Raise for fai decryption"""
@@ -31,8 +35,15 @@ class Utility :
 
     @staticmethod
     def SHA_commit(m):
-        random = get_random_bytes(256)
-        commitment = SHA256.new(random+m)
+        while 1:
+            random = getrandbits(253) # OBS choose random length another way than "its shorter than the prime"
+            data_to_hash = m + random
+            commitment = SHA256.new(str(data_to_hash).encode())
+            if(int(commitment.hexdigest(),16) >= GLOBAL_FIELD_P) :
+                continue
+
+            # Found commit within prime field GLOBAL_FIELD_P
+            break
         return (commitment.hexdigest(),random)
 
     @staticmethod
@@ -60,10 +71,8 @@ class Utility :
         """
 
         obj=ElGamal.ElGamalKey()
-
-        # Prime set after circom prime: https://docs.circom.io/circom-language/basic-operators/#field-elements
-        primeInt = 21888242871839275222246405745257275088548364400416034343698204186575808495617
-        obj.p = IntegerCustom.from_bytes(primeInt.to_bytes((primeInt.bit_length() + 7) // 8, 'big'),byteorder="big")
+        
+        obj.p = IntegerCustom.from_bytes(GLOBAL_FIELD_P.to_bytes((GLOBAL_FIELD_P.bit_length() + 7) // 8, 'big'),byteorder="big")
         q = (obj.p - 1) >> 1
 
         # Generate generator g
