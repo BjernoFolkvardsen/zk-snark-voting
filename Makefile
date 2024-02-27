@@ -40,6 +40,9 @@ clearAll:
 	make clearHashCircuit
 	make clearOrCircuit
 	make clearAndCircuit
+	make clearTestCircuit
+	make clearSetMembershipCircuit
+	make clearSchnorrCircuit
 
 clearFullCircuit:
 	rm -rf circuits/FullCircuit/NullVote_js/
@@ -83,6 +86,36 @@ clearAndCircuit:
 	rm -f circuits/AndCircuit/vkey.json
 	rm -f circuits/AndCircuit/public.json
 	rm -f circuits/AndCircuit/proof.json
+
+clearTestCircuit:
+	rm -rf circuits/TestCircuit/circuit_js/
+	rm -rf circuits/TestCircuit/*.zkey
+	rm -f circuits/TestCircuit/circuit.r1cs
+	rm -f circuits/TestCircuit/circuit.sym
+	rm -f circuits/TestCircuit/witness.wtns
+	rm -f circuits/TestCircuit/vkey.json
+	rm -f circuits/TestCircuit/public.json
+	rm -f circuits/TestCircuit/proof.json
+
+clearSetMembershipCircuit:
+	rm -rf circuits/SetMembershipCircuit/circuit_js/
+	rm -rf circuits/SetMembershipCircuit/*.zkey
+	rm -f circuits/SetMembershipCircuit/circuit.r1cs
+	rm -f circuits/SetMembershipCircuit/circuit.sym
+	rm -f circuits/SetMembershipCircuit/witness.wtns
+	rm -f circuits/SetMembershipCircuit/vkey.json
+	rm -f circuits/SetMembershipCircuit/public.json
+	rm -f circuits/SetMembershipCircuit/proof.json
+
+clearSchnorrCircuit:
+	rm -rf circuits/SchnorrCircuit/circuit_js/
+	rm -rf circuits/SchnorrCircuit/*.zkey
+	rm -f circuits/SchnorrCircuit/circuit.r1cs
+	rm -f circuits/SchnorrCircuit/circuit.sym
+	rm -f circuits/SchnorrCircuit/witness.wtns
+	rm -f circuits/SchnorrCircuit/vkey.json
+	rm -f circuits/SchnorrCircuit/public.json
+	rm -f circuits/SchnorrCircuit/proof.json
 
 # virtualenv --python=python3.5 .venv
 # source .venv/bin/activate
