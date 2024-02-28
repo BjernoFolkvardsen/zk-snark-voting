@@ -67,7 +67,7 @@ class SetupManager:
         return (signing_key,verification_key)        
 
     def setup_zk_SNARK(self):
-        working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/HashCircuit/"
+        working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/CommitmentCircuit/"
         # ptau = PTau(working_dir=working_dir)
         # ptau.start(constraints='15')
         # ptau.contribute()

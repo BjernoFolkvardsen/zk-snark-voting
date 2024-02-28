@@ -1,8 +1,7 @@
 {
   "eligible_voters": [
     {
-      "id": "Frederik",
-      "cr_id": "c7750841a9f3449d9980ab52ad755203"
+      "id": "Frederik"
     },
     {
       "id": "Isabella"
@@ -82,8 +81,8 @@
     "elgamal": {},
     "digital_signature_verification_key": ""
   },
-  "zkey_file_name": "/Users/dkIsDrRa/zk-snark-voting/src/../circuits/HashCircuit/final.zkey",
+  "zkey_file_name": "/Users/dkIsDrRa/zk-snark-voting/src/../circuits/CommitmentCircuit/final.zkey",
   "commitments": [
-    3888013589534319377067915826764791924097609612274729934874120868420377869215
+    24699636474753453122730370640993442850763609230022143634130806682126
   ]
 }

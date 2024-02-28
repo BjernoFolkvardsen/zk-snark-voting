@@ -73,7 +73,7 @@ class Voting:
 
     def zk_snark(self):
         zkey_file_name = BullitinBoard.get_zkey_file_name()
-        working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/HashCircuit/"
+        working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/CommitmentCircuit/"
         js_dir = working_dir+"circuit_js/"
         circuit = Circuit("circuit.circom", working_dir=working_dir,output_dir=working_dir, r1cs=None, js_dir=js_dir,
         wasm=js_dir+"circuit.wasm",

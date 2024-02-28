@@ -3,7 +3,7 @@ from Crypto.Hash import SHA256
 from Crypto.PublicKey import ElGamal
 from Crypto.Math.Numbers import Integer
 from Crypto.Math._IntegerCustom import IntegerCustom
-from Crypto.Hash import SHA256
+from Crypto.Hash import SHA224
 
 # Used to allow use of circom. See: https://docs.circom.io/circom-language/basic-operators/#field-elements
 GLOBAL_FIELD_P = 21888242871839275222246405745257275088548364400416034343698204186575808495617 # BN128
@@ -36,9 +36,13 @@ class Utility :
     @staticmethod
     def SHA_commit(m):
         while 1:
-            random = getrandbits(253) # OBS choose random length another way than "its shorter than the prime"
+            #random = getrandbits(253) # OBS choose random length another way than "its shorter than the prime"
+            random = 2888899555
             data_to_hash = m + random
-            commitment = SHA256.new(str(data_to_hash).encode())
+            print("cr_id_t_id:", str(data_to_hash).encode())
+            print("cr_id_t_id_bits:", bin(data_to_hash).removeprefix('0b'))
+            print("empty sha224 hex:", SHA224.new().hexdigest())
+            commitment = SHA224.new(str(data_to_hash).encode())
             if(int(commitment.hexdigest(),16) >= GLOBAL_FIELD_P) :
                 continue
 
