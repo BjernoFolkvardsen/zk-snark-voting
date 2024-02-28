@@ -1,7 +1,7 @@
 pragma circom 2.0.0;
 
 include "../HashFunctionCircuits/sha2/sha224/sha224_hash_bits.circom";
-include "../sha1-circom/circuits/sha1.circom";
+include "../sha1-circuits/circuits/sha1.circom";
 include "../../node_modules/circomlib/circuits/bitify.circom";
 
 template Main() {
