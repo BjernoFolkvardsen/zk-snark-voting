@@ -34,7 +34,7 @@ class VoterRegistration:
     def register_voter(self, id):
         #cr_id = int(self.get_pseudonym(id), 16)
         cr_id = 567890321
-        (c_id,t_id) = Utility.SHA_commit(cr_id)
+        (c_id,t_id) = Utility.commit(cr_id)
         # print("id", id)
         # print("c_id", c_id)
         # print("cr_id", cr_id)

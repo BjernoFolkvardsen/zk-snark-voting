@@ -4,6 +4,7 @@ from Crypto.PublicKey import ElGamal
 from Crypto.Math.Numbers import Integer
 from Crypto.Math._IntegerCustom import IntegerCustom
 from Crypto.Hash import SHA224
+from pyseidon.posiedon import Poseidon
 
 # Used to allow use of circom. See: https://docs.circom.io/circom-language/basic-operators/#field-elements
 GLOBAL_FIELD_P = 21888242871839275222246405745257275088548364400416034343698204186575808495617 # BN128
@@ -34,25 +35,15 @@ class Utility :
         return ((x1.__int__() * y1.__int__()) % p.__int__(), (x2.__int__() * y2.__int__()) % p.__int__())
 
     @staticmethod
-    def SHA_commit(m):
-        while 1:
-            #random = getrandbits(253) # OBS choose random length another way than "its shorter than the prime"
-            random = 2888899555
-            data_to_hash = m + random
-            print("cr_id_t_id:", str(data_to_hash).encode())
-            print("cr_id_t_id_bits:", bin(data_to_hash).removeprefix('0b'))
-            print("empty sha224 hex:", SHA224.new().hexdigest())
-            commitment = SHA224.new(str(data_to_hash).encode())
-            if(int(commitment.hexdigest(),16) >= GLOBAL_FIELD_P) :
-                continue
-
-            # Found commit within prime field GLOBAL_FIELD_P
-            break
-        return (commitment.hexdigest(),random)
+    def commit(m):
+        random = getrandbits(253) # OBS choose random length another way than "its shorter than the prime"
+        commitment = Poseidon().hash([int(m),random])
+        # Found commit within prime field GLOBAL_FIELD_P
+        return (hex(commitment),random)
 
     @staticmethod
-    def SHA_commit_verify(com,m,key):
-        return com == SHA256.new(key+m).hexdigest()
+    def commit_verify(com,m,key):
+        return com == hex(Poseidon().hash([m,key])) 
 
     @staticmethod
     def generateElGamalKey(bits, randfunc):

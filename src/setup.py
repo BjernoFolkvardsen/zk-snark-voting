@@ -17,12 +17,12 @@ class SetupManager:
         (pk,sk,p,g) = self.setup_elgamal(256)
         shares = self.get_shamirs_shares(10,20,sk,p)
         self.setup_digital_signature()
-        m = b'Hello world!'
-        (com,rand) = Utility.SHA_commit(m)
+        # m = b'Hello world!'
+        # (com,rand) = Utility.commit(m)
         # print(m)
         # print(com)
         # print(rand)
-        # print(Utility.SHA_commit_verify(com,m,rand))
+        # print(Utility.commit_verify(com,m,rand))
         #self.setup_zk_SNARK()
 
     def setup_elgamal(self,keysize):
