@@ -17,50 +17,23 @@ class VoterRegistration:
             (c_id, cr_id, t_id) = self.register_voter(eligible_voter["id"])
             self.register(eligible_voter["id"],c_id)
         
-        # register_voter('frederik')
-        # register_voter('isabella')
-        # register_voter('fink')
-        # register_voter(343)
-        # (c_id, cr_id, t_id) = self.register_voter('Frederik')
-        # (L, rt_L, sigma) = self.register('Frederik', c_id, [])
-        # (c_id, cr_id, t_id) = self.register_voter('Isabella')
-        # (L, rt_L, sigma) = self.register('Isabella', c_id, L)
-        # (c_id, cr_id, t_id) = self.register_voter('Louise')
-        # (L, rt_L, sigma) = self.register('Louise', c_id, L)
-        # (c_id, cr_id, t_id) = self.register_voter('Alberte')
-        # self.register('Alberte', c_id, L)
-        
 
     def register_voter(self, id):
-        #cr_id = int(self.get_pseudonym(id), 16)
-        cr_id = 567890321
+        cr_id = int(self.get_pseudonym(id), 16)
         (c_id,t_id) = Utility.commit(cr_id)
-        # print("id", id)
-        # print("c_id", c_id)
-        # print("cr_id", cr_id)
-        # print("t_id", t_id.hex())
-        # print()
-        print ("c_id hex:", c_id)
-        print ("c_id bin:", bin(int(c_id, 16)).removeprefix('0b'))
+
         c_id = int(c_id, 16)
-        print ("c_id int:", c_id)
         BullitinBoard.set_voter_commitments(c_id)
         return (c_id, cr_id, t_id)
 
     def get_pseudonym(self, value):
-        # pseudonyms = {}
-        # Pseudonymize the data
         pseudonym = uuid.uuid4().hex
-        # pseudonyms.setdefault(name, str(uuid.uuid4()))
-        # pseudonymized_data = [
-        #     pseudonyms.setdefault(name, str(uuid.uuid4())) for name in data
-        # ]
         BullitinBoard.set_voter_pseudonym(value, pseudonym)
         return pseudonym
 
     def register(self, id, c_id):
         L = BullitinBoard.get_list_id_commitment()
-        L.insert(0, id + "|" + c_id)
+        L.insert(0, str(id) + "|" + str(c_id))
 
         # If length of list L is less than 3 don't make merkle tree
         if len(L) > 2 :

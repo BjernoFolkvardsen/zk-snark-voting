@@ -11,8 +11,7 @@ class Tally:
         eligible_voters = BullitinBoard.get_eligible_voters()
         for eligible_voter in eligible_voters:
             cr_ids.append(eligible_voter["cr_id"])
-        # print("cr_ids", cr_ids)
-        # print()
+     
         
         random.shuffle(cr_ids)
         for cr_id in cr_ids:
@@ -22,7 +21,6 @@ class Tally:
 
     def add_vote_same_pseudonym(self, cr_id):
         ballots = BullitinBoard.get_ballot_by_cr_id(cr_id)
-        # print(ballots)
         elgamal = BullitinBoard.get_elgamal()
         for i in range(len(ballots)):
             if 0 == i :

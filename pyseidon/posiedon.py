@@ -44,11 +44,8 @@ class Poseidon:
             )
 
         state = [0] + inputs
-        # print(state)
-        # print(len(C))
         for x in range(nRoundsF + nRoundsP):
             for y in range(len(state)):
-                # print(x * t + y)
                 state[y] = state[y] + int(C[x * t + y],0)
                 if x < (nRoundsF // 2) or x >= (nRoundsF // 2 + nRoundsP):
                     state[y] = Poseidon.pow5(state[y])
