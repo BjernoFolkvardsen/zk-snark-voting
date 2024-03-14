@@ -20,7 +20,7 @@ template Multiplier2 () {
    out <== in1 * in2;
 }
 
-template OrCircuit(){
+template AndCircuit(){
    signal input a;
    signal input b;
    signal input c;
@@ -38,4 +38,4 @@ template OrCircuit(){
    out <-- isBinary && multIs20 ? 1 : 0;
    out === 1;
 }
-component main = OrCircuit();
+component main = AndCircuit();

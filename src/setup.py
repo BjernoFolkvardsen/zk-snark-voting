@@ -37,7 +37,7 @@ class SetupManager:
         return (signing_key,verification_key)        
 
     def setup_zk_SNARK(self):
-        working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/MerkleTreeInclusionCircuit/"
+        working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/FullCircuit/"
 
         ptau = PTau(ptau_file=working_dir+"../ptau_15.ptau")
 

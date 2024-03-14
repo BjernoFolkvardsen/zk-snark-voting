@@ -3,6 +3,7 @@ from src.bulletinboard import BullitinBoard
 from src.registration import VoterRegistration
 from src.utility import Utility
 from zkpy.circuit import Circuit, GROTH
+from src.merkly import MerklyTree
 import random
 import os
 import json
@@ -12,17 +13,17 @@ class Voting:
         pass
 
     def voting(self):
-        eligible_voters = BullitinBoard.get_eligible_voters()
+        voters = BullitinBoard.get_voters()
         votes_made = BullitinBoard.get_votes()
         elgamal = BullitinBoard.get_elgamal()
-        for eligible_voter in eligible_voters:
+        for voter in voters:
             for vote in votes_made:
                 self.null_votes(elgamal["prime"],elgamal["group"], elgamal["public_key"])
-                if eligible_voter["id"] == vote["voterId"] :
-                    (sk_id) = self.generateSK_id(7, eligible_voter["cr_id"])
-                    (e_v, cr_id) = self.vote(eligible_voter["id"], sk_id, elgamal["public_key"], vote["vote"],elgamal["prime"],elgamal["group"])
+                if voter == vote["voterId"] :
+                    (sk_id) = self.generateSK_id(7, voters[voter]["cr_id"])
+                    (e_v, cr_id) = self.vote(voter, sk_id, elgamal["public_key"], vote["vote"],elgamal["prime"],elgamal["group"])
                     break
-        self.change_vote(eligible_voters[0]["id"], self.generateSK_id(7, eligible_voters[0]["cr_id"]), elgamal["public_key"], 3,elgamal["prime"],elgamal["group"],1)
+        # self.change_vote(voters[0]["id"], self.generateSK_id(7, voters[0]["cr_id"]), elgamal["public_key"], 3,elgamal["prime"],elgamal["group"],1)
 
     def generateSK_id(self, t_id, cr_id):
         sk_id = (t_id, cr_id)
@@ -56,9 +57,9 @@ class Voting:
     def null_votes(self, p, g, pk_T):
         cr_ids = []
 
-        eligible_voters = BullitinBoard.get_eligible_voters()
-        for eligible_voter in eligible_voters:
-            cr_ids.append(eligible_voter["cr_id"])
+        voters = BullitinBoard.get_voters()
+        for id in voters:
+            cr_ids.append(voters[id]["cr_id"])
         selected_cr_id = random.choice(cr_ids)
         
         ballot = BullitinBoard.get_empty_ballot()
@@ -71,7 +72,7 @@ class Voting:
 
     def zk_snark(self):
         zkey_file_name = BullitinBoard.get_zkey_file_name()
-        working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/MerkleTreeInclusionCircuit/"
+        working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/FullCircuit/"
         js_dir = working_dir+"circuit_js/"
         circuit = Circuit("circuit.circom", working_dir=working_dir,output_dir=working_dir, r1cs=None, js_dir=js_dir,
         wasm=js_dir+"circuit.wasm",
@@ -80,17 +81,40 @@ class Voting:
         vkey= working_dir+"vkey.json")
 
         ## VOTE INPUT
-        # ElGamalKey = Utility.generateElGamalKey(256, get_random_bytes)
-        # (pk,sk,p,g) = (ElGamalKey.y.__int__(), ElGamalKey.x.__int__(), ElGamalKey.p.__int__(), ElGamalKey.g.__int__())
-        # print("p: ", p)
-        # r = random.randint(1, p-2)
-        # v = 0
-        # null_vote = Utility.encrypt(v,r, g, p, pk)
+        elgamal = BullitinBoard.get_elgamal()
+        r = random.randint(1, int(elgamal["prime"])-2)
+        v = 0
+        null_vote = Utility.encrypt(v,r, elgamal["group"], elgamal["prime"], elgamal["public_key"])
+        
+        id = "Alberte"
+        voter = BullitinBoard.get_voter(id)
+        cr_id = voter["cr_id"]
+        t_id = voter["t_id"]
+        list_L = BullitinBoard.get_list_id_commitment()
+        for tuple in list_L:
+            if tuple[0] == id:
+                c_id = tuple[1]
+                break
 
-        # inputs = {"pk_t":str(pk), "g":str(g), "e_v":[null_vote[0],null_vote[1]], "r":str(r), "v":str(v) }
-        # with open('circuits/FullCircuit/input.json', 'w') as f:
-        #      json.dump(inputs, f)
-        # print("inputs:", inputs)
+        (path_indices, siblings) = self.get_path_indices_and_siblings(MerklyTree(list(map(lambda x: x[1], list_L))),c_id)
+
+        inputs = {
+                    "pk_t":str(elgamal["public_key"]), 
+                    "g":str(elgamal["group"]), 
+                    "e_v":[null_vote[0],null_vote[1]], 
+                    "r":str(r), 
+                    "v":str(v), 
+                    "cr_id":str(cr_id), 
+                    "c_id":str(c_id), 
+                    "t_id":str(t_id),
+                    "root":BullitinBoard.get_merkletree_root(), 
+                    "pathIndices": path_indices,
+                    "siblings": siblings
+                  }
+
+        with open('circuits/FullCircuit/input.json', 'w') as f:
+             json.dump(inputs, f)
+        #print("inputs:", inputs)
         # print("zkey_file_name: ", zkey_file_name)
         # print("inputs_json:", json.dumps(inputs))
         # inputs_json = json.dumps(inputs)
@@ -105,3 +129,19 @@ class Voting:
         circuit.prove(GROTH)
         circuit.export_vkey(output_file=working_dir+"vkey.json")
         circuit.verify(GROTH, vkey_file=working_dir+"vkey.json", public_file=working_dir+"public.json", proof_file=working_dir+"proof.json")
+    
+    def get_path_indices_and_siblings(self, tree, leaf_value):
+        path_indices = []
+        siblings = []
+
+        proof = tree.proof(leaf_value)
+        for i, proof_node in enumerate(proof):     
+            siblings.append(proof_node.data)
+            path_indices.append(1 - proof_node.side.value)
+
+        # print("leaf_value: ", leaf_value)
+        # print("root: ", tree.root)
+        # print("path indeces: ", path_indices)
+        # print("siblings: ", siblings)
+
+        return (path_indices, siblings)

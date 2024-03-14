@@ -17,36 +17,18 @@ class VoterRegistration:
             self.register(eligible_voter["id"],c_id)
         
     def register_voter(self, id):
-        cr_id = int(self.get_pseudonym(id), 16)
+        cr_id = self.get_pseudonym(id)
         (c_id,t_id) = Utility.commit(cr_id)
 
         c_id = int(c_id, 16)
         BullitinBoard.set_voter_commitments(c_id)
+        BullitinBoard.set_voter_commitment_random(id,t_id)
         return (c_id, cr_id, t_id)
 
     def get_pseudonym(self, value):
-        pseudonym = uuid.uuid4().hex
+        pseudonym = uuid.uuid4().int
         BullitinBoard.set_voter_pseudonym(value, pseudonym)
         return pseudonym
-    
-    def get_path_indices_and_siblings(self, tree, leaf_value):
-        path_indices = []
-        siblings = []
-
-        proof = tree.proof(leaf_value)
-        for i, proof_node in enumerate(proof):     
-            siblings.append(proof_node.data)
-            path_indices.append(1 - proof_node.side.value)
-
-        # print("leaf_value: ", leaf_value)
-        # print("root: ", tree.root)
-        # print("path indeces: ", path_indices)
-        # print("siblings: ", siblings)
-
-        BullitinBoard.set_merkletree_root(tree.root)
-        return path_indices, siblings
-
-
     
     def register(self, id, c_id):
         L = BullitinBoard.get_list_id_commitment()
@@ -76,7 +58,7 @@ class VoterRegistration:
         BullitinBoard.set_voters(id)
         BullitinBoard.set_list_id_commitment(L)
         if rt_L is not None:
-            self.get_path_indices_and_siblings(rt_L, c_id)
+            BullitinBoard.set_merkletree_root(rt_L.root)
             self.verify(rt_L,  rt_L.proof(c_id), c_id, L)
         return(L, rt_L, sigma)
     

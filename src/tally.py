@@ -8,9 +8,9 @@ class Tally:
     
     def tally(self):
         cr_ids = []
-        eligible_voters = BullitinBoard.get_eligible_voters()
-        for eligible_voter in eligible_voters:
-            cr_ids.append(eligible_voter["cr_id"])
+        voters = BullitinBoard.get_voters()
+        for voter in voters:
+            cr_ids.append(voters[voter]["cr_id"])
      
         
         random.shuffle(cr_ids)
