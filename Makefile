@@ -32,12 +32,12 @@ test:
 	pytest
 
 clearNrun:
-	make clearHashCircuit
+	make clearMerkleTreeCircuit
 	make run
 
 clearAll:
 	make clearFullCircuit
-	make clearHashCircuit
+	make clearCommitmentCircuit
 	make clearOrCircuit
 	make clearAndCircuit
 	make clearTestCircuit
@@ -57,15 +57,15 @@ clearFullCircuit:
 	rm -f circuits/FullCircuit/public.json
 	rm -f circuits/FullCircuit/proof.json
 
-clearHashCircuit:
-	rm -rf circuits/HashCircuit/circuit_js/
-	rm -rf circuits/HashCircuit/*.zkey
-	rm -f circuits/HashCircuit/circuit.r1cs
-	rm -f circuits/HashCircuit/circuit.sym
-	rm -f circuits/HashCircuit/witness.wtns
-	rm -f circuits/HashCircuit/vkey.json
-	rm -f circuits/HashCircuit/public.json
-	rm -f circuits/HashCircuit/proof.json
+clearCommitmentCircuit:
+	rm -rf circuits/CommitmentCircuit/circuit_js/
+	rm -rf circuits/CommitmentCircuit/*.zkey
+	rm -f circuits/CommitmentCircuit/circuit.r1cs
+	rm -f circuits/CommitmentCircuit/circuit.sym
+	rm -f circuits/CommitmentCircuit/witness.wtns
+	rm -f circuits/CommitmentCircuit/vkey.json
+	rm -f circuits/CommitmentCircuit/public.json
+	rm -f circuits/CommitmentCircuit/proof.json
 
 clearOrCircuit:
 	rm -rf circuits/OrCircuit/circuit_js/
@@ -117,5 +117,12 @@ clearSchnorrCircuit:
 	rm -f circuits/SchnorrCircuit/public.json
 	rm -f circuits/SchnorrCircuit/proof.json
 
-# virtualenv --python=python3.5 .venv
-# source .venv/bin/activate
+clearMerkleTreeCircuit:
+	rm -rf circuits/MerkleTree/circuit_js/
+	rm -rf circuits/MerkleTree/*.zkey
+	rm -f circuits/MerkleTree/circuit.r1cs
+	rm -f circuits/MerkleTree/circuit.sym
+	rm -f circuits/MerkleTree/witness.wtns
+	rm -f circuits/MerkleTree/vkey.json
+	rm -f circuits/MerkleTree/public.json
+	rm -f circuits/MerkleTree/proof.json

@@ -1,4 +1,5 @@
 from pyseidon.constants import Constants
+from typing import List
 # This implementation of Poseidon is based on the js implementation poseidon-lite: https://github.com/vimwitch/poseidon-lite/tree/main
 
 class Poseidon:
@@ -7,13 +8,12 @@ class Poseidon:
     N_ROUNDS_P = [56, 57, 56, 60, 60, 63, 64, 63, 60, 66, 60, 65, 70, 60, 64, 68]
 
     @staticmethod
-    def pow5(v):
+    def pow5(v: int) -> int:
         o = v * v
         return (v * o * o) % Poseidon.F
 
-
     @staticmethod
-    def mix(state, M):
+    def mix(state: List[int], M: List[List[int]]) -> List[int]:
         out = []
         for x in range(len(state)):
             o = 0
@@ -23,7 +23,7 @@ class Poseidon:
         return out
 
     @staticmethod
-    def hash(inputs): 
+    def hash(inputs: List[int]) -> int: 
         inputs = [int(i) for i in inputs]
         if len(inputs) <= 0:
             raise ValueError('poseidon-lite: Not enough inputs')
@@ -44,11 +44,8 @@ class Poseidon:
             )
 
         state = [0] + inputs
-        # print(state)
-        # print(len(C))
         for x in range(nRoundsF + nRoundsP):
             for y in range(len(state)):
-                # print(x * t + y)
                 state[y] = state[y] + int(C[x * t + y],0)
                 if x < (nRoundsF // 2) or x >= (nRoundsF // 2 + nRoundsP):
                     state[y] = Poseidon.pow5(state[y])
