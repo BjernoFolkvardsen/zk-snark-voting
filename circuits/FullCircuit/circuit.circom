@@ -3,7 +3,7 @@ pragma circom 2.0.0;
 include "../AndCircuit/circuit.circom";
 include "../OrCircuit/circuit.circom";
 include "../CommitmentCircuit/circuit.circom";
-include "../SetMembershipCircuit/merkleTree.circom";
+include "../MerkleTreeInclusionCircuit/circom.circom";
 include "../VoteCircuit/vote.circom";
 include "../VoteCircuit/NullVote.circom";
 

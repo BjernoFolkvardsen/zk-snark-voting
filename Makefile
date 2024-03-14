@@ -41,7 +41,7 @@ clearAll:
 	make clearOrCircuit
 	make clearAndCircuit
 	make clearTestCircuit
-	make clearSetMembershipCircuit
+	make clearMerkleTreeInclusionCircuit
 	make clearSchnorrCircuit
 
 clearFullCircuit:
@@ -97,15 +97,15 @@ clearTestCircuit:
 	rm -f circuits/TestCircuit/public.json
 	rm -f circuits/TestCircuit/proof.json
 
-clearSetMembershipCircuit:
-	rm -rf circuits/SetMembershipCircuit/circuit_js/
-	rm -rf circuits/SetMembershipCircuit/*.zkey
-	rm -f circuits/SetMembershipCircuit/circuit.r1cs
-	rm -f circuits/SetMembershipCircuit/circuit.sym
-	rm -f circuits/SetMembershipCircuit/witness.wtns
-	rm -f circuits/SetMembershipCircuit/vkey.json
-	rm -f circuits/SetMembershipCircuit/public.json
-	rm -f circuits/SetMembershipCircuit/proof.json
+clearMerkleTreeInclusionCircuit:
+	rm -rf circuits/MerkleTreeInclusionCircuit/circuit_js/
+	rm -rf circuits/MerkleTreeInclusionCircuit/*.zkey
+	rm -f circuits/MerkleTreeInclusionCircuit/circuit.r1cs
+	rm -f circuits/MerkleTreeInclusionCircuit/circuit.sym
+	rm -f circuits/MerkleTreeInclusionCircuit/witness.wtns
+	rm -f circuits/MerkleTreeInclusionCircuit/vkey.json
+	rm -f circuits/MerkleTreeInclusionCircuit/public.json
+	rm -f circuits/MerkleTreeInclusionCircuit/proof.json
 
 clearSchnorrCircuit:
 	rm -rf circuits/SchnorrCircuit/circuit_js/

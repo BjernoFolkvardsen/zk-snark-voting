@@ -166,7 +166,10 @@ class MerklyTree(MerkleTree):
                     return Node(data=data, side=Side.RIGHT)
 
         return reduce(concat_nodes, full_proof).data == self.root
-        
+
+    def verify_correctly_build(self, leaves: List[int], root: int) -> bool:
+        return self.make_root(leaves) == root
+
     def mix_tree(
         self, leaves: List[int], proof: List[Node], leaf_index: int
     ) -> List[Node]:

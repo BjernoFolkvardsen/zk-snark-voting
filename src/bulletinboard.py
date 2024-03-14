@@ -140,19 +140,19 @@ class BullitinBoard:
 
     ## Merkle tree root
     # @staticmethod
-    # def set_merkletree_root(rt_L):
-    #     with open(BullitinBoard.path, "r") as file:
-    #         data = json.load(file)
-    #     data["merkletree_root"] = rt_L
-    #     with open(BullitinBoard.path, "w") as file:
-    #         json.dump(data, file, indent=2)
-    #     pass
+    def set_merkletree_root(root):
+        with open(BullitinBoard.path, "r") as file:
+            data = json.load(file)
+        data["merkletree_root"] = root
+        with open(BullitinBoard.path, "w") as file:
+            json.dump(data, file, indent=2)
+        pass
     
     # @staticmethod
-    # def get_merkletree_root():
-    #     with open(BullitinBoard.path, "r") as file:
-    #         data = json.load(file)
-    #     return data["merkletree_root"]
+    def get_merkletree_root():
+        with open(BullitinBoard.path, "r") as file:
+            data = json.load(file)
+        return data["merkletree_root"]
     
     ## Get voters votes
     @staticmethod

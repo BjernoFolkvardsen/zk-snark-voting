@@ -20,8 +20,8 @@ if __name__ == "__main__":
     tally_manager.tally()
 
    # ZK-SNARK testing flow
-    # setup_manager = SetupManager()
-    # setup_manager.setup_zk_SNARK()
-    # voting_manager = Voting()
-    # voting_manager.zk_snark()
+    setup_manager = SetupManager()
+    setup_manager.setup_zk_SNARK()
+    voting_manager = Voting()
+    voting_manager.zk_snark()
    

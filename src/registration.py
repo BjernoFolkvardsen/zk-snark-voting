@@ -38,11 +38,12 @@ class VoterRegistration:
             siblings.append(proof_node.data)
             path_indices.append(1 - proof_node.side.value)
 
-        print("leaf_value: ", leaf_value)
-        print("root: ", tree.root)
-        print("path indeces: ", path_indices)
-        print("siblings: ", siblings)   
+        # print("leaf_value: ", leaf_value)
+        # print("root: ", tree.root)
+        # print("path indeces: ", path_indices)
+        # print("siblings: ", siblings)
 
+        BullitinBoard.set_merkletree_root(tree.root)
         return path_indices, siblings
 
 
@@ -51,7 +52,6 @@ class VoterRegistration:
         L = BullitinBoard.get_list_id_commitment()
         tuple = (id, int(c_id))
         L.append(tuple)
-        print("L: ", L)
         # If length of list L is less than 3 don't make merkle tree
         if len(L) > 2 :
             rt_L = MerklyTree(list(map(lambda x: x[1], L)))
@@ -77,14 +77,9 @@ class VoterRegistration:
         BullitinBoard.set_list_id_commitment(L)
         if rt_L is not None:
             self.get_path_indices_and_siblings(rt_L, c_id)
+            self.verify(rt_L,  rt_L.proof(c_id), c_id, L)
         return(L, rt_L, sigma)
     
-    
-
-    def verify(self,rt_L, proof, id, c_id, L):
-        # return (rt_L.verify(proof,SHA256.new(id.encode()+c_id.encode()).hexdigest()) == True) and ((id, c_id) in L)
-        try :
-            self.get_path_indices_and_siblings(rt_L, c_id)
-        except:
-            return False
-        return True
+    def verify(self,rt_L, proof, c_id, L):
+        return rt_L.verify(proof,c_id) and rt_L.verify_correctly_build(list(map(lambda x: x[1], L)), BullitinBoard.get_merkletree_root())
+        

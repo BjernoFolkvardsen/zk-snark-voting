@@ -71,10 +71,10 @@ class Voting:
 
     def zk_snark(self):
         zkey_file_name = BullitinBoard.get_zkey_file_name()
-        working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/SetMembershipCircuit/"
-        js_dir = working_dir+"merkleTree_js/"
-        circuit = Circuit("merkleTree.circom", working_dir=working_dir,output_dir=working_dir, r1cs=None, js_dir=js_dir,
-        wasm=js_dir+"merkleTree.wasm",
+        working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/MerkleTreeInclusionCircuit/"
+        js_dir = working_dir+"circuit_js/"
+        circuit = Circuit("circuit.circom", working_dir=working_dir,output_dir=working_dir, r1cs=None, js_dir=js_dir,
+        wasm=js_dir+"circuit.wasm",
         witness=working_dir+"witness.wtns",
         zkey= zkey_file_name,
         vkey= working_dir+"vkey.json")
@@ -87,9 +87,9 @@ class Voting:
         # v = 0
         # null_vote = Utility.encrypt(v,r, g, p, pk)
 
-        # inputs = {"pk_t":pk, "g":g, "e_v":[null_vote[0],null_vote[1]], "r":r, "v":v }
+        # inputs = {"pk_t":str(pk), "g":str(g), "e_v":[null_vote[0],null_vote[1]], "r":str(r), "v":str(v) }
         # with open('circuits/FullCircuit/input.json', 'w') as f:
-        #     json.dump(inputs, f)
+        #      json.dump(inputs, f)
         # print("inputs:", inputs)
         # print("zkey_file_name: ", zkey_file_name)
         # print("inputs_json:", json.dumps(inputs))
@@ -102,9 +102,6 @@ class Voting:
         # print("inputs:", inputs)
 
         circuit.gen_witness(working_dir+"input.json")
-
         circuit.prove(GROTH)
-
         circuit.export_vkey(output_file=working_dir+"vkey.json")
-
         circuit.verify(GROTH, vkey_file=working_dir+"vkey.json", public_file=working_dir+"public.json", proof_file=working_dir+"proof.json")
