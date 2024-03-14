@@ -39,12 +39,12 @@ class SetupManager:
         return (signing_key,verification_key)        
 
     def setup_zk_SNARK(self):
-        working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/CommitmentCircuit/"
+        working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/SetMembershipCircuit/"
 
         ptau = PTau(ptau_file=working_dir+"../ptau_15.ptau")
 
 
-        circuit = Circuit("circuit.circom", working_dir=working_dir,output_dir=working_dir)
+        circuit = Circuit("merkleTree.circom", working_dir=working_dir,output_dir=working_dir)
 
         circuit.compile()
 

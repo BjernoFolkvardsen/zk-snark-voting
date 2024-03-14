@@ -1,14 +1,13 @@
 pragma circom 2.0.0;
 
-include "../node_modules/circomlib/circuits/poseidon.circom";
-include "../node_modules/circomlib/circuits/mux1.circom";
+include "../../node_modules/circomlib/circuits/poseidon.circom";
+include "../../node_modules/circomlib/circuits/mux1.circom";
 
 template MerkleTreeInclusionProof(nLevels) {
     signal input leaf;
     signal input pathIndices[nLevels];
     signal input siblings[nLevels];
-
-    signal output root;
+    signal input root;
 
     component poseidons[nLevels];
     component mux[nLevels];
@@ -35,6 +34,13 @@ template MerkleTreeInclusionProof(nLevels) {
 
         hashes[i + 1] <== poseidons[i].out;
     }
+    log("root", root);
+    log("hashes[nLevels]", hashes[nLevels]);
+    root === hashes[nLevels];
 
-    root <== hashes[nLevels];
+    signal dummy;
+    dummy <== leaf * root;
+
 }
+
+component main {public [leaf]} = MerkleTreeInclusionProof(3);

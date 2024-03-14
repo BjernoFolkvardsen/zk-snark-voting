@@ -73,10 +73,10 @@ class Voting:
 
     def zk_snark(self):
         zkey_file_name = BullitinBoard.get_zkey_file_name()
-        working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/CommitmentCircuit/"
-        js_dir = working_dir+"circuit_js/"
-        circuit = Circuit("circuit.circom", working_dir=working_dir,output_dir=working_dir, r1cs=None, js_dir=js_dir,
-        wasm=js_dir+"circuit.wasm",
+        working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/SetMembershipCircuit/"
+        js_dir = working_dir+"merkleTree_js/"
+        circuit = Circuit("merkleTree.circom", working_dir=working_dir,output_dir=working_dir, r1cs=None, js_dir=js_dir,
+        wasm=js_dir+"merkleTree.wasm",
         witness=working_dir+"witness.wtns",
         zkey= zkey_file_name,
         vkey= working_dir+"vkey.json")
@@ -99,9 +99,9 @@ class Voting:
 
         ## COMMIT INPUT
         registration_manager = VoterRegistration()
-        (c_id, cr_id, t_id) = registration_manager.register_voter('Frederik')
-        inputs = { "c_id":c_id, "cr_id":cr_id, "t_id":t_id }
-        print("inputs:", inputs)
+        # (c_id, cr_id, t_id) = registration_manager.register_voter('Frederik')
+        # inputs = { "c_id":c_id, "cr_id":cr_id, "t_id":t_id }
+        # print("inputs:", inputs)
 
         circuit.gen_witness(working_dir+"input.json")
 

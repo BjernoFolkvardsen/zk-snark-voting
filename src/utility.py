@@ -4,7 +4,10 @@ from Crypto.PublicKey import ElGamal
 from Crypto.Math.Numbers import Integer
 from Crypto.Math._IntegerCustom import IntegerCustom
 from Crypto.Hash import SHA224
+from math import log
 from pyseidon.posiedon import Poseidon
+import inspect
+
 
 # Used to allow use of circom. See: https://docs.circom.io/circom-language/basic-operators/#field-elements
 GLOBAL_FIELD_P = 21888242871839275222246405745257275088548364400416034343698204186575808495617 # BN128
@@ -105,3 +108,18 @@ class Utility :
         # Generate public key y
         obj.y = pow(obj.g, obj.x, obj.p)
         return obj
+
+    @staticmethod
+    def poseidon_hash(byte_val1: bytes, byte_val2: bytes) -> bytes:
+        #(byte_val1,byte_val2) = inputs
+        int_val1 = int.from_bytes(byte_val1, 'big')
+        int_val2 = int.from_bytes(byte_val2, 'big')
+        int_hash = Poseidon().hash([int_val1,int_val2])
+        return int_hash.to_bytes(Utility.bytes_needed(int_hash), "big")
+    
+
+    @staticmethod
+    def bytes_needed(n: int) -> int:
+        if n == 0:
+            return 1
+        return int(log(n, 256)) + 1

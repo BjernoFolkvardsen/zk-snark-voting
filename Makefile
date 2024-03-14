@@ -32,7 +32,7 @@ test:
 	pytest
 
 clearNrun:
-	make clearCommitmentCircuit
+	make clearMerkleTreeCircuit
 	make run
 
 clearAll:
@@ -117,5 +117,12 @@ clearSchnorrCircuit:
 	rm -f circuits/SchnorrCircuit/public.json
 	rm -f circuits/SchnorrCircuit/proof.json
 
-# virtualenv --python=python3.5 .venv
-# source .venv/bin/activate
+clearMerkleTreeCircuit:
+	rm -rf circuits/MerkleTree/circuit_js/
+	rm -rf circuits/MerkleTree/*.zkey
+	rm -f circuits/MerkleTree/circuit.r1cs
+	rm -f circuits/MerkleTree/circuit.sym
+	rm -f circuits/MerkleTree/witness.wtns
+	rm -f circuits/MerkleTree/vkey.json
+	rm -f circuits/MerkleTree/public.json
+	rm -f circuits/MerkleTree/proof.json
