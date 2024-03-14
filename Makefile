@@ -32,19 +32,30 @@ test:
 	pytest
 
 clearNrun:
-	make clearMerkleTreeCircuit
+	make clearFullCircuit
 	make run
 
 clearAll:
 	make clearFullCircuit
+	make clearVoteCircuit
 	make clearCommitmentCircuit
 	make clearOrCircuit
 	make clearAndCircuit
 	make clearTestCircuit
 	make clearMerkleTreeInclusionCircuit
-	make clearSchnorrCircuit
+	make clearElGamalCircuit
 
 clearFullCircuit:
+	rm -rf circuits/CommitmentCircuit/circuit_js/
+	rm -rf circuits/CommitmentCircuit/*.zkey
+	rm -f circuits/CommitmentCircuit/circuit.r1cs
+	rm -f circuits/CommitmentCircuit/circuit.sym
+	rm -f circuits/CommitmentCircuit/witness.wtns
+	rm -f circuits/CommitmentCircuit/vkey.json
+	rm -f circuits/CommitmentCircuit/public.json
+	rm -f circuits/CommitmentCircuit/proof.json
+
+clearVoteCircuit:
 	rm -rf circuits/FullCircuit/NullVote_js/
 	rm -rf circuits/FullCircuit/*.zkey
 	rm -f circuits/FullCircuit/NullVote.r1cs
@@ -87,16 +98,6 @@ clearAndCircuit:
 	rm -f circuits/AndCircuit/public.json
 	rm -f circuits/AndCircuit/proof.json
 
-clearTestCircuit:
-	rm -rf circuits/TestCircuit/circuit_js/
-	rm -rf circuits/TestCircuit/*.zkey
-	rm -f circuits/TestCircuit/circuit.r1cs
-	rm -f circuits/TestCircuit/circuit.sym
-	rm -f circuits/TestCircuit/witness.wtns
-	rm -f circuits/TestCircuit/vkey.json
-	rm -f circuits/TestCircuit/public.json
-	rm -f circuits/TestCircuit/proof.json
-
 clearMerkleTreeInclusionCircuit:
 	rm -rf circuits/MerkleTreeInclusionCircuit/circuit_js/
 	rm -rf circuits/MerkleTreeInclusionCircuit/*.zkey
@@ -107,22 +108,13 @@ clearMerkleTreeInclusionCircuit:
 	rm -f circuits/MerkleTreeInclusionCircuit/public.json
 	rm -f circuits/MerkleTreeInclusionCircuit/proof.json
 
-clearSchnorrCircuit:
-	rm -rf circuits/SchnorrCircuit/circuit_js/
-	rm -rf circuits/SchnorrCircuit/*.zkey
-	rm -f circuits/SchnorrCircuit/circuit.r1cs
-	rm -f circuits/SchnorrCircuit/circuit.sym
-	rm -f circuits/SchnorrCircuit/witness.wtns
-	rm -f circuits/SchnorrCircuit/vkey.json
-	rm -f circuits/SchnorrCircuit/public.json
-	rm -f circuits/SchnorrCircuit/proof.json
 
-clearMerkleTreeCircuit:
-	rm -rf circuits/MerkleTree/circuit_js/
-	rm -rf circuits/MerkleTree/*.zkey
-	rm -f circuits/MerkleTree/circuit.r1cs
-	rm -f circuits/MerkleTree/circuit.sym
-	rm -f circuits/MerkleTree/witness.wtns
-	rm -f circuits/MerkleTree/vkey.json
-	rm -f circuits/MerkleTree/public.json
-	rm -f circuits/MerkleTree/proof.json
+clearElGamalCircuit:
+	rm -rf circuits/ElGamalCircuit/elGamalcircuit_js/
+	rm -rf circuits/ElGamalCircuit/*.zkey
+	rm -f circuits/ElGamalCircuit/elGamalcircuit.r1cs
+	rm -f circuits/ElGamalCircuit/elGamalcircuit.sym
+	rm -f circuits/ElGamalCircuit/witness.wtns
+	rm -f circuits/ElGamalCircuit/vkey.json
+	rm -f circuits/ElGamalCircuit/public.json
+	rm -f circuits/ElGamalCircuit/proof.json
