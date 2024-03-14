@@ -12,8 +12,13 @@ template MerkleTreeInclusionProof(nLevels) {
     component poseidons[nLevels];
     component mux[nLevels];
 
+    component poseidon = Poseidon(2);
+    poseidon.inputs[0] <== leaf;
+    poseidon.inputs[1] <== 0;
+    log("poseidon hashed leaf: ", poseidon.out);
+
     signal hashes[nLevels + 1];
-    hashes[0] <== leaf;
+    hashes[0] <== poseidon.out;
 
     for (var i = 0; i < nLevels; i++) {
         pathIndices[i] * (1 - pathIndices[i]) === 0;

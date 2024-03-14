@@ -1,5 +1,5 @@
 pragma circom 2.0.0;
-include "elGamalcircuit.circom";
+include "../ElGamalCircuit/elGamalcircuit.circom";
 
 template NullVote(){
     signal input pk_t;
@@ -15,17 +15,7 @@ template NullVote(){
     encrypt.g <== g;
     encrypt.y <== pk_t;
     encrypt.m <== 0;
-    // log("pk_t", pk_t);
-    // log("g", g);
-    // log("r", r);
-    // log("encrypt.m", encrypt.m);
-    // log("encrypt.r", encrypt.r);
-    // log("encrypt.g", encrypt.g);
-    // log("encrypt.y", encrypt.y);
-    // log("e_v[0]", e_v[0]);
-    // log("e_v[1]", e_v[1]);
-    // log("encrypt.c1", encrypt.c1);
-    // log("encrypt.c2", encrypt.c2);
+    
     e_v[0] === encrypt.c1;
     // ev1 <== e_v[0] - encrypt.c1;
     e_v[1] === encrypt.c2;

@@ -31,14 +31,12 @@ class Voting:
     def vote(self, id, sk_id, pk_T, v, p, g):
         (t_id, cr_id) = sk_id
         ballot = BullitinBoard.get_empty_ballot()
-        # ballot[v] = 1
         for candidate, vote in ballot.items():
             if candidate == v:
                 ballot[candidate] = Utility.encrypt(1,random.randint(1, p-2), g, p, pk_T)
             else:
                 ballot[candidate] = Utility.encrypt(0,random.randint(1, p-2), g, p, pk_T)
         
-        # print('Ballot:', ballot)
         BullitinBoard.set_ballot(ballot, cr_id)
         return (ballot, cr_id)
     
@@ -98,7 +96,7 @@ class Voting:
         # inputs_json = json.dumps(inputs)
 
         ## COMMIT INPUT
-        registration_manager = VoterRegistration()
+        # registration_manager = VoterRegistration()
         # (c_id, cr_id, t_id) = registration_manager.register_voter('Frederik')
         # inputs = { "c_id":c_id, "cr_id":cr_id, "t_id":t_id }
         # print("inputs:", inputs)

@@ -4,9 +4,7 @@ from Crypto.Signature import eddsa
 from zkpy.ptau import PTau
 from zkpy.circuit import Circuit, GROTH
 from src.bulletinboard import BullitinBoard
-from src.utility import Utility
 import os
-#import subprocess
 import shamirs
 
 class SetupManager:
