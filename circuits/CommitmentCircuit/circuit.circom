@@ -12,8 +12,9 @@ template PoseidonCommitment() {
     hash.inputs[0] <== cr_id;
     hash.inputs[1] <== t_id;
 
-    c_id === hash.out;
-    out <== 1;
+    var commitment_assert;
+    commitment_assert = c_id == hash.out ? 1 : 0;
+    out <-- commitment_assert;
     
 
     signal dummy;
