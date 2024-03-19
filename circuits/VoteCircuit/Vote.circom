@@ -16,10 +16,6 @@ template Vote(){
     encrypt.y <== pk_t;
     encrypt.m <== v;
 
-    log("encrypt.c1", encrypt.c1);
-    log("e_v[0]", e_v[0]);
-    log("encrypt.c2", encrypt.c2);
-    log("e_v[1]", e_v[1]);
     
     // e_v[0] === encrypt.c1;
     var e_v0;
@@ -31,8 +27,6 @@ template Vote(){
     // ev1 <== e_v[0] - encrypt.c1;
     //e_v[1] === encrypt.c2;
     // ev2 <== e_v[1] - encrypt.c2;
-
-    log("vote_assert", vote_assert);
 
     out <-- vote_assert;
 

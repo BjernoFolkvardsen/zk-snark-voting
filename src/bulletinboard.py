@@ -189,7 +189,12 @@ class BullitinBoard:
         candidates = BullitinBoard.get_candidates()
         ballot = {}
         for candidate in candidates:
-            ballot[candidate["id"]] = 0
+            if candidate["id"] not in ballot:
+                ballot[candidate["id"]] = {}
+            if "vote" not in ballot[candidate["id"]]:
+                ballot[candidate["id"]]["vote"] = 0
+            if "zk_proof" not in ballot[candidate["id"]]:
+                ballot[candidate["id"]]["zk_proof"] = {}
         return  ballot #{"cr_id": cr_id, "ballot": ballot}
     
     @staticmethod
@@ -197,9 +202,9 @@ class BullitinBoard:
         data = BullitinBoard.get_data()
         if "ballots" not in data:
             data["ballots"] = {}
-        if cr_id not in data["ballots"]:
-            data["ballots"][cr_id] = []
-        data["ballots"][cr_id].append(ballot)
+        if str(cr_id) not in data["ballots"]:
+            data["ballots"][str(cr_id)] = []
+        data["ballots"][str(cr_id)].append(ballot)
         BullitinBoard.set_data(data)
 
     @staticmethod

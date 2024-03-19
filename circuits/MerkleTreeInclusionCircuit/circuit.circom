@@ -16,7 +16,6 @@ template MerkleTreeInclusionProof(nLevels) {
     component poseidon = Poseidon(2);
     poseidon.inputs[0] <== leaf;
     poseidon.inputs[1] <== 0;
-    // log("poseidon hashed leaf: ", poseidon.out);
 
     signal hashes[nLevels + 1];
     hashes[0] <== poseidon.out;
@@ -40,8 +39,7 @@ template MerkleTreeInclusionProof(nLevels) {
 
         hashes[i + 1] <== poseidons[i].out;
     }
-    // log("root", root);
-    // log("hashes[nLevels]", hashes[nLevels]);
+    
     var root_assert;
     root_assert = root == hashes[nLevels] ? 1 : 0;
 

@@ -3,6 +3,7 @@ from Crypto.PublicKey import ElGamal
 from Crypto.Math.Numbers import Integer
 from Crypto.Math._IntegerCustom import IntegerCustom
 from pyseidon.posiedon import Poseidon
+# 
 
 
 # Used to allow use of circom. See: https://docs.circom.io/circom-language/basic-operators/#field-elements
@@ -26,6 +27,7 @@ class Utility :
                 return i
         raise CouldNotDecrypt("Decryption of message failed! Message not in allowed massage space.")
 
+
     @staticmethod
     def homomorphic_addition(x, y, p):
         (x1, x2) = x
@@ -44,8 +46,10 @@ class Utility :
         return com == hex(Poseidon().hash([m,key])) 
 
     @staticmethod
-    def generateElGamalKey(bits, randfunc):
-        """Randomly generate a fresh, new ElGamal key.
+    def generateElGamalKey(randfunc):
+        """
+        Taken from https://github.com/Legrandin/pycryptodome/blob/master/lib/Crypto/PublicKey/ElGamal.py#L34-L94
+        Randomly generate a fresh, new ElGamal key.
 
         The key will be safe for use for both encryption and signature
         (although it should be used for **only one** purpose).

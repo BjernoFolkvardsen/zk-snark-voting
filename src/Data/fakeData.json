@@ -1,36 +1,16 @@
 {
   "eligible_voters": [
-    {
-      
+    { 
       "id": "Frederik"
     },
-    {
-      
-      "id": "Isabella"
+    { 
+      "id": "Mads"
     },
-    {
-  
-      "id": "Louise"
+    { 
+      "id": "Mikkel"
     },
-    {
-    
-      "id": "Alberte"
-    },
-    {
-  
-      "id": "Frank"
-    },
-    {
-    
-      "id": "Anne"
-    },
-    {
-  
-      "id": "Grete"
-    },
-    {
-    
-      "id": "Kaj"
+    { 
+      "id": "Morten"
     }
     
   ],
@@ -42,14 +22,6 @@
       {
         "id": 1,
         "candidate": "Obama"
-      },
-      {
-        "id": 2,
-        "candidate": "Bush"
-      },
-      {
-        "id": 3,
-        "candidate": "Clinton"
       }
     ],
   "votes": [
@@ -58,32 +30,16 @@
       "vote": 1
     },
     {
-      "voterId": "Isabella",
-      "vote": 2
+      "voterId": "Mads",
+      "vote": 0
     },
     {
-      "voterId": "Louise",
-      "vote": 3
-    },
-    {
-      "voterId": "Alberte",
-      "vote": 2
-    },
-    {
-      "voterId": "Frank",
+      "voterId": "Mikkel",
       "vote": 1
     },
     {
-      "voterId": "Anne",
-      "vote": 2
-    },
-    {
-      "voterId": "Grete",
+      "voterId": "Morten",
       "vote": 1
-    },
-    {
-      "voterId": "Kaj",
-      "vote": 3
     }
   ],
   "public_params": {

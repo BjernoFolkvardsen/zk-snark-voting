@@ -18,6 +18,7 @@ class VoterRegistration:
         
     def register_voter(self, id):
         cr_id = self.get_pseudonym(id)
+        print("cr_id", cr_id)
         (c_id,t_id) = Utility.commit(cr_id)
 
         c_id = int(c_id, 16)

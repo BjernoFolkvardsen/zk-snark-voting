@@ -73,4 +73,4 @@ template ZkSnarkProof(num){
     dummy <== t_id * r;
 
 }
-component main {public [pk_t, g, e_v, cr_id, pathIndices, siblings, root]} = ZkSnarkProof(5);
+component main {public [pk_t, g, e_v, cr_id, pathIndices, siblings, root]} = ZkSnarkProof(2);

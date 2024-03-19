@@ -7,7 +7,6 @@ from src.merkly import MerklyTree
 import random
 import os
 import json
-from Crypto.Random import get_random_bytes
 class Voting:
     def __init__(self):
         pass
@@ -18,28 +17,28 @@ class Voting:
         elgamal = BullitinBoard.get_elgamal()
         for voter in voters:
             for vote in votes_made:
-                self.null_votes(elgamal["prime"],elgamal["group"], elgamal["public_key"])
+                for i in range(0, random.randint(1, 2)):
+                    self.null_votes(elgamal["prime"],elgamal["group"], elgamal["public_key"])
                 if voter == vote["voterId"] :
-                    (sk_id) = self.generateSK_id(7, voters[voter]["cr_id"])
-                    (e_v, cr_id) = self.vote(voter, sk_id, elgamal["public_key"], vote["vote"],elgamal["prime"],elgamal["group"])
+                    self.vote(voter, voters[voter]["t_id"], voters[voter]["cr_id"], elgamal["public_key"], vote["vote"],elgamal["prime"],elgamal["group"])
                     break
         # self.change_vote(voters[0]["id"], self.generateSK_id(7, voters[0]["cr_id"]), elgamal["public_key"], 3,elgamal["prime"],elgamal["group"],1)
 
-    def generateSK_id(self, t_id, cr_id):
-        sk_id = (t_id, cr_id)
-        return sk_id
 
-    def vote(self, id, sk_id, pk_T, v, p, g):
-        (t_id, cr_id) = sk_id
+    def vote(self, id, t_id, cr_id, pk_T, v_id, p, g):
         ballot = BullitinBoard.get_empty_ballot()
-        for candidate, vote in ballot.items():
-            if candidate == v:
-                ballot[candidate] = Utility.encrypt(1,random.randint(1, p-2), g, p, pk_T)
-            else:
-                ballot[candidate] = Utility.encrypt(0,random.randint(1, p-2), g, p, pk_T)
+        for candidate, empty_value in ballot.items():
+            r = random.randint(1, p-2)
+            if candidate == v_id:
+                vote = 1
+            else :
+                vote = 0
+            e_v = Utility.encrypt(vote,r, g, p, pk_T)
+            ballot[candidate]["vote"] = e_v
+            ballot[candidate]["zk_proof"] = self.zk_snark(id, vote, cr_id, t_id, e_v, r, g, pk_T)
+            
         
         BullitinBoard.set_ballot(ballot, cr_id)
-        return (ballot, cr_id)
     
     def change_vote(self, id, sk_id, pk_T, v_new, p, g, v_pre):
         (t_id, cr_id) = sk_id
@@ -52,25 +51,27 @@ class Voting:
             else:
                 ballot[candidate] = Utility.encrypt(0,random.randint(1, p-2), g, p, pk_T)
         BullitinBoard.set_ballot(ballot, cr_id)
-        return (ballot, cr_id)
     
     def null_votes(self, p, g, pk_T):
+        random.seed() 
         cr_ids = []
 
         voters = BullitinBoard.get_voters()
         for id in voters:
             cr_ids.append(voters[id]["cr_id"])
         selected_cr_id = random.choice(cr_ids)
+
         
         ballot = BullitinBoard.get_empty_ballot()
-    
-        for candidate, vote in ballot.items():
-            ballot[candidate] = Utility.encrypt(0,random.randint(1, p-2), g, p, pk_T)
+        for candidate, empty_value in ballot.items():
+            r = random.randint(1, p-2)
+            e_v = Utility.encrypt(0,r, g, p, pk_T)
+            ballot[candidate]["vote"] = e_v
+            ballot[candidate]["zk_proof"] = self.zk_snark(0, 0, selected_cr_id, 0, e_v, r, g, pk_T)
         BullitinBoard.set_ballot(ballot, selected_cr_id)
-        return (ballot, selected_cr_id)
 
 
-    def zk_snark(self):
+    def zk_snark(self, id, v, cr_id, t_id, encrypt_vote, r, g, pk_T):
         zkey_file_name = BullitinBoard.get_zkey_file_name()
         working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/FullCircuit/"
         js_dir = working_dir+"circuit_js/"
@@ -79,56 +80,50 @@ class Voting:
         witness=working_dir+"witness.wtns",
         zkey= zkey_file_name,
         vkey= working_dir+"vkey.json")
-
-        ## VOTE INPUT
-        elgamal = BullitinBoard.get_elgamal()
-        r = random.randint(1, int(elgamal["prime"])-2)
-        v = 0
-        null_vote = Utility.encrypt(v,r, elgamal["group"], elgamal["prime"], elgamal["public_key"])
         
-        id = "Alberte"
-        voter = BullitinBoard.get_voter(id)
-        cr_id = voter["cr_id"]
-        t_id = voter["t_id"]
         list_L = BullitinBoard.get_list_id_commitment()
-        for tuple in list_L:
-            if tuple[0] == id:
-                c_id = tuple[1]
-                break
-
-        (path_indices, siblings) = self.get_path_indices_and_siblings(MerklyTree(list(map(lambda x: x[1], list_L))),c_id)
+        if(id!=0):
+            for tuple in list_L:
+                if tuple[0] == id:
+                    c_id = tuple[1]
+                    break
+            (path_indices, siblings) = self.get_path_indices_and_siblings(MerklyTree(list(map(lambda x: x[1], list_L))),c_id)
+        else:
+            tuple = random.choice(list_L)
+            (path_indices, siblings) = self.get_path_indices_and_siblings(MerklyTree(list(map(lambda x: x[1], list_L))),tuple[1])
+            c_id = 0
 
         inputs = {
-                    "pk_t":str(elgamal["public_key"]), 
-                    "g":str(elgamal["group"]), 
-                    "e_v":[null_vote[0],null_vote[1]], 
-                    "r":str(r), 
-                    "v":str(v), 
-                    "cr_id":str(cr_id), 
-                    "c_id":str(c_id), 
+                    "pk_t":str(pk_T),
+                    "g":str(g),
+                    "e_v":[str(encrypt_vote[0]),str(encrypt_vote[1])],
+                    "r":str(r),
+                    "v":str(v),
+                    "cr_id":str(cr_id),
+                    "c_id":str(c_id),
                     "t_id":str(t_id),
-                    "root":BullitinBoard.get_merkletree_root(), 
-                    "pathIndices": path_indices,
-                    "siblings": siblings
+                    "root": str(BullitinBoard.get_merkletree_root()),
+                    "pathIndices": list(map(lambda x: str(x), path_indices)),
+                    "siblings": list(map(lambda x: str(x), siblings))
                   }
 
         with open('circuits/FullCircuit/input.json', 'w') as f:
-             json.dump(inputs, f)
-        #print("inputs:", inputs)
-        # print("zkey_file_name: ", zkey_file_name)
-        # print("inputs_json:", json.dumps(inputs))
-        # inputs_json = json.dumps(inputs)
-
-        ## COMMIT INPUT
-        # registration_manager = VoterRegistration()
-        # (c_id, cr_id, t_id) = registration_manager.register_voter('Frederik')
-        # inputs = { "c_id":c_id, "cr_id":cr_id, "t_id":t_id }
-        # print("inputs:", inputs)
+             json.dump(inputs, f, indent=2)
 
         circuit.gen_witness(working_dir+"input.json")
         circuit.prove(GROTH)
         circuit.export_vkey(output_file=working_dir+"vkey.json")
-        circuit.verify(GROTH, vkey_file=working_dir+"vkey.json", public_file=working_dir+"public.json", proof_file=working_dir+"proof.json")
+
+        proof_data = {"vkey":{}, "public": {}, "proof": {}}
+        with open("circuits/FullCircuit/vkey.json", "r") as file:
+            proof_data["vkey"] = json.load(file)
+        with open("circuits/FullCircuit/public.json", "r") as file:
+            proof_data["public"] = json.load(file)
+        with open("circuits/FullCircuit/proof.json", "r") as file:
+            proof_data["proof"] = json.load(file)
+        
+        return proof_data
+        # circuit.verify(GROTH, vkey_file=working_dir+"vkey.json", public_file=working_dir+"public.json", proof_file=working_dir+"proof.json")
     
     def get_path_indices_and_siblings(self, tree, leaf_value):
         path_indices = []
@@ -138,10 +133,5 @@ class Voting:
         for i, proof_node in enumerate(proof):     
             siblings.append(proof_node.data)
             path_indices.append(1 - proof_node.side.value)
-
-        # print("leaf_value: ", leaf_value)
-        # print("root: ", tree.root)
-        # print("path indeces: ", path_indices)
-        # print("siblings: ", siblings)
 
         return (path_indices, siblings)

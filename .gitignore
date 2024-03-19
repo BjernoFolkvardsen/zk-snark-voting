@@ -15,6 +15,12 @@ tests/__pycache__/
 # Circom
 circuit_cpp/
 circuit_js/
+*.zkey
+*.sym
+*.r1cs
+vkey.json
+proof.json
+public.json
 
 # C extensions
 *.so

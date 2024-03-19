@@ -4,21 +4,23 @@ from Crypto.Signature import eddsa
 from zkpy.ptau import PTau
 from zkpy.circuit import Circuit, GROTH
 from src.bulletinboard import BullitinBoard
+from src.utility import Utility
 import os
 import shamirs
+
 
 class SetupManager:
     def __init__(self):
         pass 
     
     def setup(self):
-        (pk,sk,p,g) = self.setup_elgamal(256)
+        (pk,sk,p,g) = self.setup_elgamal()
         shares = self.get_shamirs_shares(10,20,sk,p)
         self.setup_digital_signature()
-        #self.setup_zk_SNARK()
+        self.setup_zk_SNARK()
 
-    def setup_elgamal(self,keysize):
-        ElGamalKey = ElGamal.generate(keysize, get_random_bytes)
+    def setup_elgamal(self):
+        ElGamalKey = Utility.generateElGamalKey(get_random_bytes)
 
         BullitinBoard.set_elgamal(ElGamalKey.y.__int__(), ElGamalKey.p.__int__(), ElGamalKey.g.__int__())
         BullitinBoard.set_private_param("elgamal_priv_key", ElGamalKey.x.__int__())
