@@ -42,9 +42,10 @@ template MerkleTreeInclusionProof(nLevels) {
     }
     // log("root", root);
     // log("hashes[nLevels]", hashes[nLevels]);
-    root === hashes[nLevels];
+    var root_assert;
+    root_assert = root == hashes[nLevels] ? 1 : 0;
 
-    out <== 1;
+    out <-- root_assert;
 
     signal dummy;
     dummy <== leaf * root;
