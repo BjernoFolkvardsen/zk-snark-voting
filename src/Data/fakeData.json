@@ -22,12 +22,17 @@
       {
         "id": 1,
         "candidate": "Obama"
+      },
+      {
+        "id": 2,
+        "candidate": "Clinton"
       }
     ],
   "votes": [
     {
       "voterId": "Frederik",
-      "vote": 1
+      "vote": 1,
+      "re-vote": 0
     },
     {
       "voterId": "Mads",
@@ -39,7 +44,7 @@
     },
     {
       "voterId": "Morten",
-      "vote": 1
+      "vote": 2
     }
   ],
   "public_params": {

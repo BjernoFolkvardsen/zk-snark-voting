@@ -21,8 +21,9 @@ class Voting:
                     self.null_votes(elgamal["prime"],elgamal["group"], elgamal["public_key"])
                 if voter == vote["voterId"] :
                     self.vote(voter, voters[voter]["t_id"], voters[voter]["cr_id"], elgamal["public_key"], vote["vote"],elgamal["prime"],elgamal["group"])
-                    break
-        # self.change_vote(voters[0]["id"], self.generateSK_id(7, voters[0]["cr_id"]), elgamal["public_key"], 3,elgamal["prime"],elgamal["group"],1)
+                    # if "re-vote" in vote:
+                    #  self.vote(voter, voters[voter]["t_id"], voters[voter]["cr_id"], elgamal["public_key"], vote["re-vote"],elgamal["prime"],elgamal["group"])
+                    #  break
 
 
     def vote(self, id, t_id, cr_id, pk_T, v_id, p, g):
@@ -37,20 +38,37 @@ class Voting:
             ballot[candidate]["vote"] = e_v
             ballot[candidate]["zk_proof"] = self.zk_snark(id, vote, cr_id, t_id, e_v, r, g, pk_T)
             
-        
         BullitinBoard.set_ballot(ballot, cr_id)
     
-    def change_vote(self, id, sk_id, pk_T, v_new, p, g, v_pre):
-        (t_id, cr_id) = sk_id
-        ballot = BullitinBoard.get_empty_ballot()
-        for candidate, vote in ballot.items():
-            if candidate == v_new:
-                ballot[candidate] = Utility.encrypt(1,random.randint(1, p-2), g, p, pk_T)
-            elif candidate == v_pre:
-                ballot[candidate] = Utility.encrypt(-1,random.randint(1, p-2), g, p, pk_T)
-            else:
-                ballot[candidate] = Utility.encrypt(0,random.randint(1, p-2), g, p, pk_T)
-        BullitinBoard.set_ballot(ballot, cr_id)
+    # def change_vote(self, id, t_id, cr_id, pk_T, v_new, p, g, v_pre):
+    #     elgamal = BullitinBoard.get_elgamal()
+    #     elgamal_priv_key = BullitinBoard.get_private_param("elgamal_priv_key")
+    #     ballot = BullitinBoard.get_empty_ballot()
+    #     for candidate, empty_value in ballot.items():
+    #         r = random.randint(1, p-2)
+    #         if candidate == v_new:
+    #             print("Candidatenew: ", candidate)
+    #             vote = 1
+    #         elif candidate == v_pre:
+    #             print("Candidatepre: ", candidate)
+    #             vote = -1
+    #         else:
+    #             vote = 0
+    #         e_v = Utility.encrypt(vote,r, g, p, pk_T)
+    #         print("Vote: ", vote)
+    #         print("Vote e_V: ", e_v)
+    #         ballot[candidate]["vote"] = e_v
+    #        # ballot[candidate]["zk_proof"] = self.zk_snark(id, vote, cr_id, t_id, e_v, r, g, pk_T)
+
+    #     print("id", id)
+    #     print("ballot", ballot)
+    #     print("vote 0: ", Utility.decrypt(ballot[0]["vote"][0], ballot[0]["vote"][1],elgamal["group"],elgamal["prime"],elgamal_priv_key))
+    #     print("test enc", pow(g.__int__(),-1,p.__int__()))
+    #     print("test enc mod p", (pow(g.__int__(),-1,p.__int__())) % p.__int__())
+    #     print("org enc", (ballot[1]["vote"][1] * pow(ballot[1]["vote"][0], -1*elgamal_priv_key.__int__(), p.__int__())))
+    #     print("org enc mod p", (ballot[1]["vote"][1] * pow(ballot[1]["vote"][0], -1*elgamal_priv_key.__int__(), p.__int__())) % p.__int__())
+    #     print("vote 1: ", Utility.decrypt(ballot[1]["vote"][0], ballot[1]["vote"][1],elgamal["group"],elgamal["prime"],elgamal_priv_key))
+    #     BullitinBoard.set_ballot(ballot, cr_id)
     
     def null_votes(self, p, g, pk_T):
         random.seed() 

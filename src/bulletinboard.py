@@ -220,6 +220,24 @@ class BullitinBoard:
             data["final_ballots"] = []
         data["final_ballots"].append(final_ballot)
         BullitinBoard.set_data(data)
+
+    @staticmethod
+    def get_final_ballots():
+        data = BullitinBoard.get_data()
+        return data["final_ballots"]
+    
+    @staticmethod
+    def set_pet_ballots(final_ballot):
+        data = BullitinBoard.get_data()
+        if "final_pet_ballots" not in data:
+            data["final_pet_ballots"] = []
+        data["final_pet_ballots"].append(final_ballot)
+        BullitinBoard.set_data(data)
+    
+    @staticmethod
+    def get_pet_ballots():
+        data = BullitinBoard.get_data()
+        return data["final_pet_ballots"]
     
     @staticmethod
     def set_final_ballots_decrypted(final_ballot_decrypted, cr_id):
@@ -238,5 +256,11 @@ class BullitinBoard:
     def set_winner(highest_number, winner):
         data = BullitinBoard.get_data()
         data["winner"] = ( highest_number, winner)
+        BullitinBoard.set_data(data)
+    
+    @staticmethod
+    def set_result(result):
+        data = BullitinBoard.get_data()
+        data["result"] = (result)
         BullitinBoard.set_data(data)
     

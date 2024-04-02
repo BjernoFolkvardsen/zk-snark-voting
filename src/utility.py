@@ -3,11 +3,11 @@ from Crypto.PublicKey import ElGamal
 from Crypto.Math.Numbers import Integer
 from Crypto.Math._IntegerCustom import IntegerCustom
 from pyseidon.posiedon import Poseidon
-# 
-
+import random
 
 # Used to allow use of circom. See: https://docs.circom.io/circom-language/basic-operators/#field-elements
 GLOBAL_FIELD_P = 21888242871839275222246405745257275088548364400416034343698204186575808495617 # BN128
+MAX_NUMBER_OF_VOTERS = 1000
 
 class CouldNotDecrypt(Exception):
     """Raise for fai decryption"""
@@ -21,11 +21,25 @@ class Utility :
         return c1, c2
     
     @staticmethod
-    def decrypt(c1, c2,g,p,x):
-        for i in range(500):
-            if pow(g.__int__(),i,p.__int__()) == (c2 * pow(c1, -1*x.__int__(), p.__int__())) % p.__int__() :
+    def decrypt(c1, c2, g, p, x):
+        for i in range(MAX_NUMBER_OF_VOTERS):
+            if pow(g,i,p) == (c2 * pow(c1, -1*x, p)) % p :
                 return i
         raise CouldNotDecrypt("Decryption of message failed! Message not in allowed massage space.")
+    
+    @staticmethod
+    def pet(a1, a2, m, g,p,y,x):
+        r = random.randint(1, p-2)
+        (b1,b2) = Utility.encrypt(m, r, g, p, y)
+        (c1,c2) = (a1/b1 ,a2/b2)
+        print("PET c1: ", c1)
+        print(type(c1))
+        print(type(c2))
+        print("PET c2: ", c2)
+        result = Utility.decrypt(c1, c2, float(g), float(p), float(x))
+        print("PET result for: ", m, " -> ", result)
+        return  1 == result
+        # raise ElgamalError("Something went wrong! Could not check the equality of the given cipher texts.")
 
 
     @staticmethod
