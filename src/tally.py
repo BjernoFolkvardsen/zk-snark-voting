@@ -1,6 +1,9 @@
 from src.bulletinboard import BullitinBoard
 from src.utility import Utility
+from zkpy.circuit import Circuit, GROTH
 import random
+import json
+import os
 
 class Tally:
     def __init__(self):
@@ -8,31 +11,65 @@ class Tally:
     
     def tally(self):
         cr_ids = []
-        eligible_voters = BullitinBoard.get_eligible_voters()
-        for eligible_voter in eligible_voters:
-            cr_ids.append(eligible_voter["cr_id"])
+        voters = BullitinBoard.get_voters()
+        for voter in voters:
+            cr_ids.append(voters[voter]["cr_id"])
      
         
         random.shuffle(cr_ids)
         for cr_id in cr_ids:
             self.add_vote_same_pseudonym(cr_id)
         
-        self.calculate_results()
+        final_ballots = self.pet()
+        
+        self.calculate_results(final_ballots)
+
+    def verify_ballot_votes(self, ballot):
+        # ballot[candidate_id]["vote"]
+        # ballot[candidate_id]["zk_proof"]
+        # ballot[candidate_id]["zk_proof"]["vkey"]
+        # ballot[candidate_id]["zk_proof"]["public"]
+        # ballot[candidate_id]["zk_proof"]["proof"]
+
+        #print("ballot", ballot)
+        for candidate_id in ballot:
+            print("candidate_vote", ballot[candidate_id])
+            working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../tmp/"
+            circuit = Circuit("circuit.circom", working_dir=working_dir,output_dir=working_dir)
+            with open("tmp/vkey.json", "w") as file:
+                json.dump(ballot[candidate_id]["zk_proof"]["vkey"], file)
+            with open("tmp/public.json", "w") as file:
+                json.dump(ballot[candidate_id]["zk_proof"]["public"], file)
+            with open("tmp/proof.json", "w") as file:
+                json.dump(ballot[candidate_id]["zk_proof"]["proof"], file)
+
+            print("Verify ballot: ",circuit.verify(GROTH, vkey_file=working_dir+"vkey.json", public_file=working_dir+"public.json", proof_file=working_dir+"proof.json"))
+
+            if False == circuit.verify(GROTH, vkey_file=working_dir+"vkey.json", public_file=working_dir+"public.json", proof_file=working_dir+"proof.json"):
+                return False
+        return True
 
     def add_vote_same_pseudonym(self, cr_id):
         ballots = BullitinBoard.get_ballot_by_cr_id(cr_id)
         elgamal = BullitinBoard.get_elgamal()
+        elgamal_priv_key = BullitinBoard.get_private_param("elgamal_priv_key")
+        x = 0
+        final_ballot = {}
         for i in range(len(ballots)):
-            if 0 == i :
-                final_ballot = ballots[i]
+            if x == i:
+                if self.verify_ballot_votes(ballots[i]) :
+                    for j in range(len(ballots[i])):
+                        final_ballot[j.__str__()] = ballots[i][j.__str__()]["vote"]
+                else:
+                    x = x+1
             else :
-                for j in range(len(final_ballot)):
-                    final_ballot[j.__str__()] = Utility.homomorphic_addition(final_ballot[j.__str__()], ballots[i][j.__str__()], elgamal["prime"])
+                if self.verify_ballot_votes(ballots[i]):
+                    for j in range(len(final_ballot)):
+                        final_ballot[j.__str__()] = Utility.homomorphic_addition(final_ballot[j.__str__()], ballots[i][j.__str__()]["vote"], elgamal["prime"])
         
         BullitinBoard.set_final_ballots(final_ballot)
 
         ## for test only
-        elgamal_priv_key = BullitinBoard.get_private_param("elgamal_priv_key")
         final_ballot_decrypted = {}
         for j in range(len(final_ballot)):
             final_ballot_decrypted[j.__str__()] = Utility.decrypt(final_ballot[j.__str__()][0], final_ballot[j.__str__()][1],elgamal["group"],elgamal["prime"],elgamal_priv_key)
@@ -42,23 +79,46 @@ class Tally:
 
         return (final_ballot)
     
-    def calculate_results(self):
-        candidates = BullitinBoard.get_candidates()
-        results = {str(candidate["id"]): 0 for candidate in candidates}
-        total_entries = 0
-        data = BullitinBoard.get_final_ballots_decrypted()
-        
+    def pet(self):
+        final_ballots = BullitinBoard.get_final_ballots()
+        elgamal = BullitinBoard.get_elgamal()
+        elgamal_priv_key = BullitinBoard.get_private_param("elgamal_priv_key")
+        final_pet_ballots = []
+        for ballot in final_ballots:
+            total_votes = 0
+            votes_valid = True
+            for candidate_id, candidate_data in ballot.items():
+                vote = Utility.decrypt(candidate_data[0], candidate_data[1], elgamal["group"], elgamal["prime"], elgamal_priv_key)
+                if vote not in [0, 1]:
+                    print(f"Invalid vote for candidate {candidate_id} in ballot {ballot}")
+                    votes_valid = False
+                    break
+                if vote == 1:
+                    ballot_winner = candidate_id
+                total_votes += vote
+            if votes_valid and total_votes in [0, 1]:
+                final_pet_ballots.append(ballot_winner)
+        BullitinBoard.set_pet_ballots(final_pet_ballots) # for testing
+        return final_pet_ballots
 
-        for ballot in data.values():
-            total_entries += 1
-            for key, value in ballot.items():
-                results[key] += value
+    
+    def calculate_results(self, final_ballots):
+        candidates = BullitinBoard.get_candidates()
+        results = {str(candidate["id"]): 0 for candidate in candidates}  
+        id_to_name = {str(candidate["id"]): candidate["candidate"] for candidate in candidates}
+
+
+        for candidate_id in final_ballots:
+            results[str(candidate_id)] += 1
+
+        results_with_names = {id_to_name[id]: count for id, count in results.items()}
 
         highest_number = max(results, key=results.get)
         winner = next((candidate for candidate in candidates if str(candidate["id"]) == highest_number), None)
 
         BullitinBoard.set_winner(highest_number, winner)
-        return results, total_entries, highest_number, winner["candidate"] if winner else None
+        BullitinBoard.set_result(results_with_names)
+        return results, highest_number, winner["candidate"] if winner else None
 
 
     

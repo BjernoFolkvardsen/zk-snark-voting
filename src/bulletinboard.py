@@ -74,15 +74,17 @@ class BullitinBoard:
     @staticmethod
     def set_voter_pseudonym(name, cr_id):
         data = BullitinBoard.get_data()
-        for voter in data["eligible_voters"]:
-            if voter["id"] == name:    
-                voter["cr_id"] = cr_id
+        if "voters" not in data:
+            data["voters"] = {}
+        if name not in data["voters"]:
+            data["voters"][name] = {}
+        data["voters"][name]["cr_id"] = cr_id
         BullitinBoard.set_data(data)
 
     @staticmethod
-    def get_voter_pseudonym():
+    def get_voter_pseudonym(id):
         data = BullitinBoard.get_data()
-        return data["eligible_voters"]["cr_id"]
+        return data["voters"][id]["cr_id"]
 
     ## Commitment
     @staticmethod
@@ -115,14 +117,30 @@ class BullitinBoard:
     def set_voters(id):
         data = BullitinBoard.get_data()
         if "voters" not in data:
-            data["voters"] = []
-        data["voters"].append(id)
+            data["voters"] = {}
+        if id not in data["voters"]:
+            data["voters"][id] = {}
+        BullitinBoard.set_data(data)
+        
+    @staticmethod
+    def set_voter_commitment_random(id,t_id):
+        data = BullitinBoard.get_data()
+        if "voters" not in data:
+            data["voters"] = {}
+        if id not in data["voters"]:
+            data["voters"][id] = {}
+        data["voters"][id]["t_id"] = t_id
         BullitinBoard.set_data(data)
 
     @staticmethod
     def get_voters():
         data = BullitinBoard.get_data()
         return data["voters"]
+    
+    @staticmethod
+    def get_voter(id:str):
+        data = BullitinBoard.get_data()
+        return data["voters"][id]
     
     ## List of commitment and id (L)
     @staticmethod
@@ -171,7 +189,12 @@ class BullitinBoard:
         candidates = BullitinBoard.get_candidates()
         ballot = {}
         for candidate in candidates:
-            ballot[candidate["id"]] = 0
+            if candidate["id"] not in ballot:
+                ballot[candidate["id"]] = {}
+            if "vote" not in ballot[candidate["id"]]:
+                ballot[candidate["id"]]["vote"] = 0
+            if "zk_proof" not in ballot[candidate["id"]]:
+                ballot[candidate["id"]]["zk_proof"] = {}
         return  ballot #{"cr_id": cr_id, "ballot": ballot}
     
     @staticmethod
@@ -179,15 +202,15 @@ class BullitinBoard:
         data = BullitinBoard.get_data()
         if "ballots" not in data:
             data["ballots"] = {}
-        if cr_id not in data["ballots"]:
-            data["ballots"][cr_id] = []
-        data["ballots"][cr_id].append(ballot)
+        if str(cr_id) not in data["ballots"]:
+            data["ballots"][str(cr_id)] = []
+        data["ballots"][str(cr_id)].append(ballot)
         BullitinBoard.set_data(data)
 
     @staticmethod
     def get_ballot_by_cr_id(cr_id):
         data = BullitinBoard.get_data()
-        return data["ballots"][cr_id]
+        return data["ballots"][str(cr_id)]
 
     ## Final ballots
     @staticmethod
@@ -197,6 +220,24 @@ class BullitinBoard:
             data["final_ballots"] = []
         data["final_ballots"].append(final_ballot)
         BullitinBoard.set_data(data)
+
+    @staticmethod
+    def get_final_ballots():
+        data = BullitinBoard.get_data()
+        return data["final_ballots"]
+    
+    @staticmethod
+    def set_pet_ballots(final_ballot):
+        data = BullitinBoard.get_data()
+        if "final_pet_ballots" not in data:
+            data["final_pet_ballots"] = []
+        data["final_pet_ballots"].append(final_ballot)
+        BullitinBoard.set_data(data)
+    
+    @staticmethod
+    def get_pet_ballots():
+        data = BullitinBoard.get_data()
+        return data["final_pet_ballots"]
     
     @staticmethod
     def set_final_ballots_decrypted(final_ballot_decrypted, cr_id):
@@ -215,5 +256,11 @@ class BullitinBoard:
     def set_winner(highest_number, winner):
         data = BullitinBoard.get_data()
         data["winner"] = ( highest_number, winner)
+        BullitinBoard.set_data(data)
+    
+    @staticmethod
+    def set_result(result):
+        data = BullitinBoard.get_data()
+        data["result"] = (result)
         BullitinBoard.set_data(data)
     
