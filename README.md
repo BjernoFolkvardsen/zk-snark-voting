@@ -39,7 +39,7 @@ Before you begin, ensure you have the following installed:
 ## Circom Setup
 Before proceeding with the project, you need to set up Circom. Follow these steps:
 
-Check Circom to see how [﻿Circom Installation Guide](%5Bhttps://docs.circom.io/getting-started/installation/%5D(https://docs.circom.io/getting-started/installation/)) 
+Check Circom to see how [Circom Installation Guide](https://docs.circom.io/getting-started/installation/%5D(https://docs.circom.io/getting-started/installation/))
 
 ### Circum setup in short
 #### Installing Dependencies
@@ -101,10 +101,10 @@ make local-setup
 make run
 ```
 ## Issues
-If you encounter any issues or have suggestions, please open an issue [﻿here](https://github.com/BjernoFolkvardsenDev/zk-snark-voting/issues).
+If you encounter any issues or have suggestions, please open an issue [here](https://github.com/BjernoFolkvardsenDev/zk-snark-voting/issues).
 
 ## License
-[﻿MIT](https://choosealicense.com/licenses/mit/) 
+[MIT](https://choosealicense.com/licenses/mit/)
 
 
 <!--- Eraser file: https://app.eraser.io/workspace/zx1sidB790zsXeMk08so --->

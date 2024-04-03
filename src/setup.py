@@ -1,4 +1,4 @@
-from Crypto.PublicKey import ElGamal, ECC
+from Crypto.PublicKey import ECC
 from Crypto.Random import get_random_bytes
 from Crypto.Signature import eddsa
 from zkpy.ptau import PTau
@@ -8,10 +8,16 @@ from src.utility import Utility
 import os
 import shamirs
 
-
 class SetupManager:
+
+    bb: BullitinBoard = None
+
     def __init__(self):
-        pass 
+        self.bb = BullitinBoard(env="local", args={"type": "mongo_db"})
+        self.setup()
+
+    def use_dummy_data(self):
+        self.bb.generate_data()
     
     def setup(self):
         (pk,sk,p,g) = self.setup_elgamal()
@@ -22,8 +28,8 @@ class SetupManager:
     def setup_elgamal(self):
         ElGamalKey = Utility.generateElGamalKey(get_random_bytes)
 
-        BullitinBoard.set_elgamal(ElGamalKey.y.__int__(), ElGamalKey.p.__int__(), ElGamalKey.g.__int__())
-        BullitinBoard.set_private_param("elgamal_priv_key", ElGamalKey.x.__int__())
+        self.bb.set_elgamal(str(ElGamalKey.y), str(ElGamalKey.p), str(ElGamalKey.g))
+        self.bb.set_private_param("elgamal_priv_key", str(ElGamalKey.x))
         return (ElGamalKey.y, ElGamalKey.x, ElGamalKey.p, ElGamalKey.g)
 
     def get_shamirs_shares(self,threshold,share_num,sk,p):
@@ -34,8 +40,8 @@ class SetupManager:
         signing_key = ECC.generate(curve='ed25519')
         verification_key = eddsa.import_public_key(signing_key.public_key().export_key(format='raw'))
 
-        BullitinBoard.set_digital_signature(verification_key.export_key(format='OpenSSH'))
-        BullitinBoard.set_private_param("signing_key", signing_key.export_key(format='PEM'))
+        self.bb.set_digital_signature(verification_key.export_key(format='OpenSSH'))
+        self.bb.set_private_param("signing_key", signing_key.export_key(format='PEM'))
         return (signing_key,verification_key)        
 
     def setup_zk_SNARK(self):
@@ -49,4 +55,4 @@ class SetupManager:
         circuit.print_constraints()
         circuit.setup(GROTH, ptau)
         circuit.contribute_phase2(entropy="p1", output_file=working_dir+"final.zkey")
-        BullitinBoard.set_zkey_file_name(circuit.zkey_file)
+        self.bb.set_zkey_file_name(circuit.zkey_file)

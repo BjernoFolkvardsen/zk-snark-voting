@@ -1,44 +1,84 @@
 {
   "eligible_voters": [
     {
-      "id": "Frederik"
+      "id": 0,
+      "name": "Heather"
     },
     {
-      "id": "Mads"
+      "id": 1,
+      "name": "Brenda"
     },
     {
-      "id": "Mikkel"
+      "id": 2,
+      "name": "Joseph"
     },
     {
-      "id": "Morten"
+      "id": 3,
+      "name": "Caleb"
+    },
+    {
+      "id": 4,
+      "name": "Amanda"
+    },
+    {
+      "id": 5,
+      "name": "Katherine"
+    },
+    {
+      "id": 6,
+      "name": "Wendy"
+    },
+    {
+      "id": 7,
+      "name": "Kathryn"
     }
   ],
   "candidates": [
     {
       "id": 0,
-      "candidate": "Trump"
+      "candidate": "Danny Davis"
     },
     {
       "id": 1,
-      "candidate": "Obama"
+      "candidate": "Jill Bruce"
+    },
+    {
+      "id": 2,
+      "candidate": "Kimberly Clayton"
     }
   ],
   "votes": [
     {
-      "voterId": "Frederik",
+      "voterId": 2,
       "vote": 1
     },
     {
-      "voterId": "Mads",
+      "voterId": 2,
       "vote": 0
     },
     {
-      "voterId": "Mikkel",
+      "voterId": 4,
+      "vote": 2
+    },
+    {
+      "voterId": 3,
+      "vote": 2
+    },
+    {
+      "voterId": 7,
       "vote": 1
     },
     {
-      "voterId": "Morten",
+      "voterId": 6,
       "vote": 1
+    },
+    {
+      "voterId": 5,
+      "vote": 1
+    },
+    {
+      "voterId": 6,
+      "vote": 2
     }
   ],
   "public_params": {

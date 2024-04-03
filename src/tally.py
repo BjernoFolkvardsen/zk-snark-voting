@@ -6,34 +6,26 @@ import json
 import os
 
 class Tally:
+    bb: BullitinBoard = None
+
     def __init__(self):
-        self.votes = {}
+        self.bb = BullitinBoard(env="local", args={"type": "mongo_db"})
     
     def tally(self):
         cr_ids = []
-        voters = BullitinBoard.get_voters()
+        voters = self.bb.get_voters()
         for voter in voters:
-            cr_ids.append(voters[voter]["cr_id"])
-     
+            cr_ids.append(voter["cr_id"])
         
         random.shuffle(cr_ids)
         for cr_id in cr_ids:
             self.add_vote_same_pseudonym(cr_id)
         
         final_ballots = self.pet()
-        
         self.calculate_results(final_ballots)
 
     def verify_ballot_votes(self, ballot):
-        # ballot[candidate_id]["vote"]
-        # ballot[candidate_id]["zk_proof"]
-        # ballot[candidate_id]["zk_proof"]["vkey"]
-        # ballot[candidate_id]["zk_proof"]["public"]
-        # ballot[candidate_id]["zk_proof"]["proof"]
-
-        #print("ballot", ballot)
         for candidate_id in ballot:
-            print("candidate_vote", ballot[candidate_id])
             working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../tmp/"
             circuit = Circuit("circuit.circom", working_dir=working_dir,output_dir=working_dir)
             with open("tmp/vkey.json", "w") as file:
@@ -43,70 +35,74 @@ class Tally:
             with open("tmp/proof.json", "w") as file:
                 json.dump(ballot[candidate_id]["zk_proof"]["proof"], file)
 
-            print("Verify ballot: ",circuit.verify(GROTH, vkey_file=working_dir+"vkey.json", public_file=working_dir+"public.json", proof_file=working_dir+"proof.json"))
-
             if False == circuit.verify(GROTH, vkey_file=working_dir+"vkey.json", public_file=working_dir+"public.json", proof_file=working_dir+"proof.json"):
                 return False
         return True
 
     def add_vote_same_pseudonym(self, cr_id):
-        ballots = BullitinBoard.get_ballot_by_cr_id(cr_id)
-        elgamal = BullitinBoard.get_elgamal()
-        elgamal_priv_key = BullitinBoard.get_private_param("elgamal_priv_key")
+        ballots = self.bb.get_ballot_by_cr_id(cr_id)
+        elgamal = self.bb.get_elgamal()
+        elgamal_priv_key = self.bb.get_private_param("elgamal_priv_key")
         x = 0
         final_ballot = {}
         for i in range(len(ballots)):
             if x == i:
-                if self.verify_ballot_votes(ballots[i]) :
-                    for j in range(len(ballots[i])):
-                        final_ballot[j.__str__()] = ballots[i][j.__str__()]["vote"]
+                if self.verify_ballot_votes(ballots[i]["data"]) :
+                    for j in range(len(ballots[i]["data"])):
+                        final_ballot[j.__str__()] = ballots[i]["data"][j.__str__()]["vote"]
                 else:
                     x = x+1
             else :
-                if self.verify_ballot_votes(ballots[i]):
+                if self.verify_ballot_votes(ballots[i]["data"]):
                     for j in range(len(final_ballot)):
-                        final_ballot[j.__str__()] = Utility.homomorphic_addition(final_ballot[j.__str__()], ballots[i][j.__str__()]["vote"], elgamal["prime"])
-        
-        BullitinBoard.set_final_ballots(final_ballot)
+                        final_ballot[j.__str__()] = Utility.homomorphic_addition(final_ballot[j.__str__()], ballots[i]["data"][j.__str__()]["vote"], int(elgamal["prime"]))
 
         ## for test only
         final_ballot_decrypted = {}
         for j in range(len(final_ballot)):
-            final_ballot_decrypted[j.__str__()] = Utility.decrypt(final_ballot[j.__str__()][0], final_ballot[j.__str__()][1],elgamal["group"],elgamal["prime"],elgamal_priv_key)
+            final_ballot_decrypted[j.__str__()] = Utility.decrypt(int(final_ballot[j.__str__()][0]), int(final_ballot[j.__str__()][1]),int(elgamal["group"]),int(elgamal["prime"]),int(elgamal_priv_key))
         
-        BullitinBoard.set_final_ballots_decrypted(final_ballot_decrypted, cr_id)
+        self.bb.set_final_ballots_decrypted(final_ballot_decrypted, cr_id)
         ##***************
+
+        self.bb.set_final_ballots(final_ballot)
 
         return (final_ballot)
     
     def pet(self):
-        final_ballots = BullitinBoard.get_final_ballots()
-        elgamal = BullitinBoard.get_elgamal()
-        elgamal_priv_key = BullitinBoard.get_private_param("elgamal_priv_key")
+        final_ballots = self.bb.get_final_ballots()
+        elgamal = self.bb.get_elgamal()
+        elgamal_priv_key = self.bb.get_private_param("elgamal_priv_key")
         final_pet_ballots = []
+        print("final_ballots", final_ballots)
+        print()
         for ballot in final_ballots:
             total_votes = 0
-            votes_valid = True
+            votes_valid = False
             for candidate_id, candidate_data in ballot.items():
-                vote = Utility.decrypt(candidate_data[0], candidate_data[1], elgamal["group"], elgamal["prime"], elgamal_priv_key)
+                print("candidate_id", candidate_id)
+                print("candidate_data", candidate_data)
+                vote = Utility.decrypt(int(candidate_data[0]), int(candidate_data[1]),int(elgamal["group"]), int(elgamal["prime"]), int(elgamal_priv_key))
+                print("vote", vote)
+                print()
                 if vote not in [0, 1]:
                     print(f"Invalid vote for candidate {candidate_id} in ballot {ballot}")
-                    votes_valid = False
                     break
                 if vote == 1:
+                    votes_valid = True
                     ballot_winner = candidate_id
                 total_votes += vote
             if votes_valid and total_votes in [0, 1]:
                 final_pet_ballots.append(ballot_winner)
-        BullitinBoard.set_pet_ballots(final_pet_ballots) # for testing
+        self.bb.set_pet_ballots(final_pet_ballots) # for testing
+        print(final_pet_ballots)
         return final_pet_ballots
 
     
     def calculate_results(self, final_ballots):
-        candidates = BullitinBoard.get_candidates()
+        candidates = self.bb.get_candidates()
         results = {str(candidate["id"]): 0 for candidate in candidates}  
         id_to_name = {str(candidate["id"]): candidate["candidate"] for candidate in candidates}
-
 
         for candidate_id in final_ballots:
             results[str(candidate_id)] += 1
@@ -116,8 +112,8 @@ class Tally:
         highest_number = max(results, key=results.get)
         winner = next((candidate for candidate in candidates if str(candidate["id"]) == highest_number), None)
 
-        BullitinBoard.set_winner(highest_number, winner)
-        BullitinBoard.set_result(results_with_names)
+        self.bb.set_winner(highest_number, winner)
+        self.bb.set_result(results_with_names)
         return results, highest_number, winner["candidate"] if winner else None
 
 

@@ -1,4 +1,4 @@
-pragma circom 2.0.0;
+pragma circom 2.1.6;
 include "../ElGamalCircuit/elGamalcircuit.circom";
 
 template NullVote(){
@@ -15,7 +15,7 @@ template NullVote(){
     encrypt.g <== g;
     encrypt.y <== pk_t;
     encrypt.m <== 0;
-    
+
     e_v[0] === encrypt.c1;
     // ev1 <== e_v[0] - encrypt.c1;
     e_v[1] === encrypt.c2;

@@ -1,4 +1,4 @@
-pragma circom 2.0.0;
+pragma circom 2.1.6;
 
 include "../../node_modules/circomlib/circuits/poseidon.circom";
 include "../../node_modules/circomlib/circuits/mux1.circom";
@@ -16,6 +16,7 @@ template MerkleTreeInclusionProof(nLevels) {
     component poseidon = Poseidon(2);
     poseidon.inputs[0] <== leaf;
     poseidon.inputs[1] <== 0;
+    log("hashed leaf", poseidon.out);
 
     signal hashes[nLevels + 1];
     hashes[0] <== poseidon.out;
@@ -37,10 +38,14 @@ template MerkleTreeInclusionProof(nLevels) {
         poseidons[i].inputs[0] <== mux[i].out[0];
         poseidons[i].inputs[1] <== mux[i].out[1];
 
+        log("hashed level", i);
+        log(poseidons[i].out);
         hashes[i + 1] <== poseidons[i].out;
     }
-    
+
     var root_assert;
+    log("root",root);
+    log("hashed root",hashes[nLevels]);
     root_assert = root == hashes[nLevels] ? 1 : 0;
 
     out <-- root_assert;

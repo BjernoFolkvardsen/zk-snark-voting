@@ -15,13 +15,13 @@ class CouldNotDecrypt(Exception):
 
 class Utility :
     @staticmethod
-    def encrypt(m, r, g,p,y):
+    def encrypt(m, r:int, g:int,p:int,y:int):
         c1 = pow(g.__int__(), r, p.__int__())
         c2 = (pow(g.__int__(), m, p.__int__()) * pow(y.__int__(), r, p.__int__())) % p.__int__()
         return c1, c2
     
     @staticmethod
-    def decrypt(c1, c2, g, p, x):
+    def decrypt(c1:int, c2:int, g:int, p:int, x:int):
         for i in range(MAX_NUMBER_OF_VOTERS):
             if pow(g,i,p) == (c2 * pow(c1, -1*x, p)) % p :
                 return i
@@ -43,10 +43,10 @@ class Utility :
 
 
     @staticmethod
-    def homomorphic_addition(x, y, p):
+    def homomorphic_addition(x:list[str,str], y:list[str,str], p:int):
         (x1, x2) = x
         (y1, y2) = y
-        return ((x1.__int__() * y1.__int__()) % p.__int__(), (x2.__int__() * y2.__int__()) % p.__int__())
+        return [str((int(x1) * int(y1)) % p), str((int(x2) * int(y2)) % p)]
 
     @staticmethod
     def commit(m):

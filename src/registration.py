@@ -6,62 +6,49 @@ from Crypto.Signature import eddsa
 import uuid
 
 class VoterRegistration:
+
+    bb: BullitinBoard = None
+
     def __init__(self):
-        pass
+        self.bb = BullitinBoard(env="local", args={"type": "mongo_db"})
 
     def registration(self):
-        eligible_voters = BullitinBoard.get_eligible_voters()
+        eligible_voters = self.bb.get_eligible_voters()
 
         for eligible_voter in eligible_voters:
-            (c_id, cr_id, t_id) = self.register_voter(eligible_voter["id"])
+            (c_id, cr_id, t_id) = self.register_voter(eligible_voter["id"], eligible_voter["name"])
             self.register(eligible_voter["id"],c_id)
+
+        self.publish_merkletree()
         
-    def register_voter(self, id):
+    def register_voter(self, id, name):
         cr_id = self.get_pseudonym(id)
         (c_id,t_id) = Utility.commit(cr_id)
 
         c_id = int(c_id, 16)
-        BullitinBoard.set_voter_commitments(c_id)
-        BullitinBoard.set_voter_commitment_random(id,t_id)
+        self.bb.set_voter_commitments(c_id)
+        self.bb.set_voter(name, cr_id,id,t_id)
         return (c_id, cr_id, t_id)
 
     def get_pseudonym(self, value):
         pseudonym = uuid.uuid4().int
-        BullitinBoard.set_voter_pseudonym(value, pseudonym)
         return pseudonym
     
     def register(self, id, c_id):
-        L = BullitinBoard.get_list_id_commitment()
-        tuple = (id, int(c_id))
-        L.append(tuple)
-        # If length of list L is less than 3 don't make merkle tree
-        if len(L) > 2 :
-            rt_L = MerklyTree(list(map(lambda x: x[1], L)))
-            signing_key = ECC.import_key(BullitinBoard.get_private_param("signing_key"))
+        L = self.bb.get_list_id_commitment()
+        self.bb.set_list_id_commitment((str(id), str(c_id)))
+    
+    def publish_merkletree(self):
+        L = self.bb.get_list_id_commitment()
+        rt_L = MerklyTree(list(map(lambda x: int(x[1]), L)))
+        signing_key = ECC.import_key(self.bb.get_private_param("signing_key"))
+        signer = eddsa.new(signing_key, 'rfc8032')
+        sigma = signer.sign(str(rt_L.root).encode())
 
-            # Creating byte array for list l and merkle tree root combined
-            l_rt_L_bytes = bytearray()
-            # Add all elements of l to byte array
-            for elem in L:
-                l_rt_L_bytes.extend(bytearray(str(elem[0]).encode()))
-                l_rt_L_bytes.extend(bytearray(str(elem[1]).encode()))
-            # Add all leaves from merkle tree root to byte array
-            for elem in rt_L.leaves:
-                l_rt_L_bytes.extend(bytearray(str(elem).encode()))
-            
-            signer = eddsa.new(signing_key, 'rfc8032')
-            sigma = signer.sign(bytes(l_rt_L_bytes))
-        else :
-            rt_L = None
-            sigma = None
-        
-        BullitinBoard.set_voters(id)
-        BullitinBoard.set_list_id_commitment(L)
-        if rt_L is not None:
-            BullitinBoard.set_merkletree_root(rt_L.root)
-            self.verify(rt_L,  rt_L.proof(c_id), c_id, L)
-        return(L, rt_L, sigma)
+        self.bb.set_merkletree_root(str(rt_L.root))
+        self.bb.set_merkletree_sigma(str(sigma))
+        # self.verify(rt_L,  rt_L.proof(int(c_id)), int(c_id), L)
     
     def verify(self,rt_L, proof, c_id, L):
-        return rt_L.verify(proof,c_id) and rt_L.verify_correctly_build(list(map(lambda x: x[1], L)), BullitinBoard.get_merkletree_root())
+        return rt_L.verify(proof,c_id) and rt_L.verify_correctly_build(list(map(lambda x: int(x[1]), L)), self.bb.get_merkletree_root())
         
