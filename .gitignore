@@ -21,6 +21,16 @@ circuit_js/
 vkey.json
 proof.json
 public.json
+circuits/*/circuit_js
+circuits/*/*.zkey
+circuits/*/*.sym
+circuits/*/*.r1cs
+circuits/*/*.wtns
+circuits/OldCircuits/*/circuit_js
+circuits/OldCircuits/*/*.zkey
+circuits/OldCircuits/*/*.sym
+circuits/OldCircuits/*/*.r1cs
+circuits/OldCircuits/*/*.wtns
 
 # C extensions
 *.so
