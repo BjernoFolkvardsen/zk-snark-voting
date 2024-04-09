@@ -12,12 +12,11 @@ class SetupManager:
 
     bb: BullitinBoard = None
 
-    def __init__(self):
+    def __init__(self, dummy_data=False):
         self.bb = BullitinBoard(env="local", args={"type": "mongo_db"})
+        if dummy_data:
+            self.bb.generate_data(num_voters=dummy_data["num_voters"], num_candidates=dummy_data["num_candidates"])
         self.setup()
-
-    def use_dummy_data(self):
-        self.bb.generate_data()
     
     def setup(self):
         (pk,sk,p,g) = self.setup_elgamal()
@@ -26,6 +25,7 @@ class SetupManager:
         self.setup_zk_SNARK()
 
     def setup_elgamal(self):
+
         ElGamalKey = Utility.generateElGamalKey(get_random_bytes)
 
         self.bb.set_elgamal(str(ElGamalKey.y), str(ElGamalKey.p), str(ElGamalKey.g))
@@ -45,14 +45,23 @@ class SetupManager:
         return (signing_key,verification_key)        
 
     def setup_zk_SNARK(self):
+        eligible_voters = self.bb.get_eligible_voters()
+        treedepth = Utility.calc_tree_depth(len(eligible_voters))
+        if treedepth > 30:
+            raise Exception("Too many voters for the zk-SNARK proof. The maximum number of voters is 2^30.")
         working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/FullCircuit/"
-
-        ptau = PTau(ptau_file=working_dir+"../ptau_15.ptau")
-
+        ptau = PTau(ptau_file=working_dir+"../ptau_13.ptau")
+        # Create the circuit from the template with the correct depth of the merkle tree
+        with open(working_dir+"circuit.txt") as f:
+            with open(working_dir+"circuit.circom", "w") as f1:
+                for line in f:
+                    f1.write(line)
+                f1.write("component main {public [pk_t, g, e_v, cr_id, pathIndices, siblings, root]} = ZkSnarkProof("+str(treedepth)+");")
+        
         circuit = Circuit("circuit.circom", working_dir=working_dir,output_dir=working_dir)
         circuit.compile()
-        circuit.get_info()
-        circuit.print_constraints()
+        # circuit.get_info()
+        # circuit.print_constraints()
         circuit.setup(GROTH, ptau)
         circuit.contribute_phase2(entropy="p1", output_file=working_dir+"final.zkey")
         self.bb.set_zkey_file_name(circuit.zkey_file)

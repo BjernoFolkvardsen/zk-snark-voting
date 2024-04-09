@@ -4,7 +4,6 @@ include "../CommitmentCircuit/circuit.circom";
 include "../MerkleTreeInclusionCircuit/circuit.circom";
 include "../VoteCircuit/Vote.circom";
 
-
 template ZkSnarkProof(num){
     // Private
     signal input r;
@@ -66,12 +65,12 @@ template ZkSnarkProof(num){
     vote_com = vote_check && com_check ? 1 : 0;
     part_one = vote_com && mtip_check ? 1 : 0;
 
-    log("vote_check: ", vote_check);
-    log("com_check: ", com_check);
-    log("vote_com: ", vote_com);
-    log("mtip_check: ", mtip_check);
-    log("part_one: ", part_one);
-    log("null_vote_check: ", null_vote_check);
+    // log("vote_check: ", vote_check);
+    // log("com_check: ", com_check);
+    // log("vote_com: ", vote_com);
+    // log("mtip_check: ", mtip_check);
+    // log("part_one: ", part_one);
+    // log("null_vote_check: ", null_vote_check);
     out <-- part_one || null_vote_check ? 1 : 0;
     out === 1;
 
@@ -79,4 +78,4 @@ template ZkSnarkProof(num){
     dummy <== t_id * r;
 
 }
-component main {public [pk_t, g, e_v, cr_id, pathIndices, siblings, root]} = ZkSnarkProof(3);
+// component main {public [pk_t, g, e_v, cr_id, pathIndices, siblings, root]} = ZkSnarkProof(3);

@@ -24,8 +24,6 @@ class Voting:
             for i in range(0, random.randint(1, 2)):
                     self.null_votes(prime,group, public_key)
             for vote in votes_made:
-                print("vote: ", vote)
-                print("voter: ", voter)
                 if voter["id"] == vote["voterId"] :
                     self.vote(voter["id"], voter["t_id"], voter["cr_id"], public_key, vote["vote"], prime, group)
                     self.verify_vote_on_bb(voter["cr_id"])
@@ -39,7 +37,6 @@ class Voting:
         ballot = self.bb.get_empty_ballot()
         for candidate, empty_value in ballot.items():
             r = random.randint(1, p-2)
-            print(" POW", candidate, v_id)
             if candidate == v_id:
                 vote = 1
             else :
@@ -81,7 +78,7 @@ class Voting:
     #     BullitinBoard.set_ballot(ballot, cr_id)
     
     def null_votes(self, p, g, pk_T):
-        random.seed() 
+        random.seed()
         cr_ids = []
 
         voters = self.bb.get_voters()
@@ -110,23 +107,13 @@ class Voting:
         vkey= working_dir+"vkey.json")
         
         list_L = self.bb.get_list_id_commitment()
-        print("list_L",list_L)
         if(id!=0):
             for tuple in list_L:
                 if tuple[0] == id:
                     c_id = tuple[1]
                     break
             tree = MerklyTree(list(map(lambda x: int(x[1]), list_L)))
-            print("tree raw",tree.raw_leaves)
-            print()
-            print("tree hashed",tree.leaves)
-            print()
-            print("c_id",c_id)
-            print()
             (path_indices, siblings) = self.get_path_indices_and_siblings(tree,int(c_id))
-            print("path_indices",path_indices)
-            print()
-            print("siblings",siblings)
         else:
             tuple = random.choice(list_L)
             (path_indices, siblings) = self.get_path_indices_and_siblings(MerklyTree(list(map(lambda x: int(x[1]), list_L))),int(tuple[1]))

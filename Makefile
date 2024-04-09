@@ -48,32 +48,32 @@ clearAll:
 	make clearCommitmentCircuit
 	make clearOrCircuit
 	make clearAndCircuit
-	make clearTestCircuit
 	make clearMerkleTreeInclusionCircuit
 	make clearElGamalCircuit
 
 clearFullCircuit:
-	rm -rf circuits/CommitmentCircuit/circuit_js/
-	rm -rf circuits/CommitmentCircuit/*.zkey
-	rm -f circuits/CommitmentCircuit/circuit.r1cs
-	rm -f circuits/CommitmentCircuit/circuit.sym
-	rm -f circuits/CommitmentCircuit/witness.wtns
-	rm -f circuits/CommitmentCircuit/vkey.json
-	rm -f circuits/CommitmentCircuit/public.json
-	rm -f circuits/CommitmentCircuit/proof.json
-
-clearVoteCircuit:
-	rm -rf circuits/FullCircuit/NullVote_js/
+	rm -rf circuits/FullCircuit/circuit_js/
 	rm -rf circuits/FullCircuit/*.zkey
-	rm -f circuits/FullCircuit/NullVote.r1cs
-	rm -f circuits/FullCircuit/NullVote.sym
-	rm -rf circuits/FullCircuit/Vote_js/
-	rm -f circuits/FullCircuit/Vote.r1cs
-	rm -f circuits/FullCircuit/Vote.sym
+	rm -f circuits/FullCircuit/circuit.r1cs
+	rm -f circuits/FullCircuit/circuit.sym
 	rm -f circuits/FullCircuit/witness.wtns
 	rm -f circuits/FullCircuit/vkey.json
 	rm -f circuits/FullCircuit/public.json
 	rm -f circuits/FullCircuit/proof.json
+	rm -f circuits/FullCircuit/circuit.circom
+
+clearVoteCircuit:
+	rm -rf circuits/VoteCircuit/NullVote_js/
+	rm -rf circuits/VoteCircuit/*.zkey
+	rm -f circuits/VoteCircuit/NullVote.r1cs
+	rm -f circuits/VoteCircuit/NullVote.sym
+	rm -rf circuits/VoteCircuit/Vote_js/
+	rm -f circuits/VoteCircuit/Vote.r1cs
+	rm -f circuits/VoteCircuit/Vote.sym
+	rm -f circuits/VoteCircuit/witness.wtns
+	rm -f circuits/VoteCircuit/vkey.json
+	rm -f circuits/VoteCircuit/public.json
+	rm -f circuits/VoteCircuit/proof.json
 
 clearCommitmentCircuit:
 	rm -rf circuits/CommitmentCircuit/circuit_js/
@@ -86,24 +86,24 @@ clearCommitmentCircuit:
 	rm -f circuits/CommitmentCircuit/proof.json
 
 clearOrCircuit:
-	rm -rf circuits/OrCircuit/circuit_js/
-	rm -rf circuits/OrCircuit/*.zkey
-	rm -f circuits/OrCircuit/circuit.r1cs
-	rm -f circuits/OrCircuit/circuit.sym
-	rm -f circuits/OrCircuit/witness.wtns
-	rm -f circuits/OrCircuit/vkey.json
-	rm -f circuits/OrCircuit/public.json
-	rm -f circuits/OrCircuit/proof.json
+	rm -rf circuits/OldCircuits/OrCircuit/circuit_js/
+	rm -rf circuits/OldCircuits/OrCircuit/*.zkey
+	rm -f circuits/OldCircuits/OrCircuit/circuit.r1cs
+	rm -f circuits/OldCircuits/OrCircuit/circuit.sym
+	rm -f circuits/OldCircuits/OrCircuit/witness.wtns
+	rm -f circuits/OldCircuits/OrCircuit/vkey.json
+	rm -f circuits/OldCircuits/OrCircuit/public.json
+	rm -f circuits/OldCircuits/OrCircuit/proof.json
 
 clearAndCircuit:
-	rm -rf circuits/AndCircuit/circuit_js/
-	rm -rf circuits/AndCircuit/*.zkey
-	rm -f circuits/AndCircuit/circuit.r1cs
-	rm -f circuits/AndCircuit/circuit.sym
-	rm -f circuits/AndCircuit/witness.wtns
-	rm -f circuits/AndCircuit/vkey.json
-	rm -f circuits/AndCircuit/public.json
-	rm -f circuits/AndCircuit/proof.json
+	rm -rf circuits/OldCircuits/AndCircuit/circuit_js/
+	rm -rf circuits/OldCircuits/AndCircuit/*.zkey
+	rm -f circuits/OldCircuits/AndCircuit/circuit.r1cs
+	rm -f circuits/OldCircuits/AndCircuit/circuit.sym
+	rm -f circuits/OldCircuits/AndCircuit/witness.wtns
+	rm -f circuits/OldCircuits/AndCircuit/vkey.json
+	rm -f circuits/OldCircuits/AndCircuit/public.json
+	rm -f circuits/OldCircuits/AndCircuit/proof.json
 
 clearMerkleTreeInclusionCircuit:
 	rm -rf circuits/MerkleTreeInclusionCircuit/circuit_js/

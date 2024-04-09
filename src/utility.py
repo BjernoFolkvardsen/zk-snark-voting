@@ -4,6 +4,7 @@ from Crypto.Math.Numbers import Integer
 from Crypto.Math._IntegerCustom import IntegerCustom
 from pyseidon.posiedon import Poseidon
 import random
+import math
 
 # Used to allow use of circom. See: https://docs.circom.io/circom-language/basic-operators/#field-elements
 GLOBAL_FIELD_P = 21888242871839275222246405745257275088548364400416034343698204186575808495617 # BN128
@@ -58,6 +59,9 @@ class Utility :
     @staticmethod
     def commit_verify(com,m,key):
         return com == hex(Poseidon().hash([m,key])) 
+    
+    def calc_tree_depth(num_voters):
+        return math.ceil(math.log(num_voters,2))
 
     @staticmethod
     def generateElGamalKey(randfunc):

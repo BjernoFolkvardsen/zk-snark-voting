@@ -27,7 +27,7 @@ class BullitinBoard:
                 self.db_type = "local_file"
                 self.path = "src/Data/data.json"
 
-    def generate_data(self, num_voters=8, num_candidates=3):
+    def generate_data(self, num_voters=4, num_candidates=2):
         fake = Faker()
 
         eligible_voters = [{"id": str(i), "name": fake.first_name()} for i in range(num_voters)]
@@ -157,6 +157,9 @@ class BullitinBoard:
     ## List of commitment and id (L)
     def set_list_id_commitment(self, tuple: (str,str)):
         self.set_data({"tuple":tuple},collection_name="id_commitment")
+
+    def set_many_list_id_commitment(self, tuple_list: list[dict]):
+        self.set_data(data=tuple_list,collection_name="id_commitment", many=True)
     
     def get_list_id_commitment(self):
         data = self.get_data(collection_name="id_commitment")

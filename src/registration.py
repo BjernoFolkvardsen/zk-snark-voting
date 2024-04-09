@@ -4,6 +4,7 @@ from src.utility import Utility
 from Crypto.PublicKey import ECC
 from Crypto.Signature import eddsa
 import uuid
+import random
 
 class VoterRegistration:
 
@@ -16,6 +17,9 @@ class VoterRegistration:
         eligible_voters = self.bb.get_eligible_voters()
 
         for eligible_voter in eligible_voters:
+            if random.randint(0,4) == 0:
+                # print("Voter didn't register: ", eligible_voter)
+                continue
             (c_id, cr_id, t_id) = self.register_voter(eligible_voter["id"], eligible_voter["name"])
             self.register(eligible_voter["id"],c_id)
 
@@ -35,10 +39,16 @@ class VoterRegistration:
         return pseudonym
     
     def register(self, id, c_id):
-        L = self.bb.get_list_id_commitment()
         self.bb.set_list_id_commitment((str(id), str(c_id)))
     
     def publish_merkletree(self):
+        tuple_list = []
+        eligible_voters = self.bb.get_eligible_voters()
+        max_voter_num = len(eligible_voters)
+        treedepth = Utility.calc_tree_depth(max_voter_num)
+        for i in range(pow(2,treedepth)-max_voter_num):
+            tuple_list.append({"tuple":("-1", "0")})
+        self.bb.set_many_list_id_commitment(tuple_list)
         L = self.bb.get_list_id_commitment()
         rt_L = MerklyTree(list(map(lambda x: int(x[1]), L)))
         signing_key = ECC.import_key(self.bb.get_private_param("signing_key"))
