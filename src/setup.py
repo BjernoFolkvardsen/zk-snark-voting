@@ -12,8 +12,8 @@ class SetupManager:
 
     bb: BullitinBoard = None
 
-    def __init__(self, dummy_data=False):
-        self.bb = BullitinBoard(env="local", args={"type": "mongo_db"})
+    def __init__(self, bb: BullitinBoard, dummy_data=False):
+        self.bb = bb
         if dummy_data:
             self.bb.generate_data(num_voters=dummy_data["num_voters"], num_candidates=dummy_data["num_candidates"])
         self.setup()

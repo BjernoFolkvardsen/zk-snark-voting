@@ -10,8 +10,8 @@ import json
 class Voting:
     bb: BullitinBoard = None
 
-    def __init__(self):
-        self.bb = BullitinBoard(env="local", args={"type": "mongo_db"})
+    def __init__(self, bb: BullitinBoard):
+        self.bb = bb
 
     def voting(self):
         voters = self.bb.get_voters()

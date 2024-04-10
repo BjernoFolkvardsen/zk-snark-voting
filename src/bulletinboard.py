@@ -21,7 +21,10 @@ class BullitinBoard:
             if args["type"] == "mongo_db":
                 self.path = "src/Data/test.json"
                 client = pymongo.MongoClient("mongodb://localhost:27017/")
-                self.db = client["db"]
+                if "db_name" in args:
+                    self.db = client[str(args["db_name"])]
+                else:
+                    self.db = client["db"]
                 self.db_type = "local_mongo_db"
             else:
                 self.db_type = "local_file"

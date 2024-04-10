@@ -8,8 +8,8 @@ import os
 class Tally:
     bb: BullitinBoard = None
 
-    def __init__(self):
-        self.bb = BullitinBoard(env="local", args={"type": "mongo_db"})
+    def __init__(self, bb: BullitinBoard):
+        self.bb = bb
     
     def tally(self):
         cr_ids = []
