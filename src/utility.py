@@ -29,18 +29,16 @@ class Utility :
         raise CouldNotDecrypt("Decryption of message failed! Message not in allowed massage space.")
     
     @staticmethod
-    def pet(a1, a2, m, g,p,y,x):
+    def pet(a1, a2, m, g, p, y, x):
         r = random.randint(1, p-2)
         (b1,b2) = Utility.encrypt(m, r, g, p, y)
-        (c1,c2) = (a1/b1 ,a2/b2)
-        print("PET c1: ", c1)
-        print(type(c1))
-        print(type(c2))
-        print("PET c2: ", c2)
-        result = Utility.decrypt(c1, c2, float(g), float(p), float(x))
-        print("PET result for: ", m, " -> ", result)
-        return  1 == result
-        # raise ElgamalError("Something went wrong! Could not check the equality of the given cipher texts.")
+        (c1, c2) = (a1* (pow(b1,(p-2), p)) % p), (a2 * (pow(b2,(p-2), p)) % p) 
+        # Math is from this paper: https://medium.com/@VitalikButerin/exploring-elliptic-curve-pairings-c73c1864e627
+        # curve point division
+        z = random.randint(1, p-2)  # Generate a random exponent z
+        (c1, c2) = (pow(c1, z, p), pow(c2, z, p))  # Blind the ciphertext
+        print("test:", (pow(c1, -1*x, p) * c2) % p)
+        return  (pow(c1, -1*x, p) * c2) % p == 1
 
 
     @staticmethod

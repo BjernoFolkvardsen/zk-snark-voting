@@ -21,7 +21,7 @@ class Tally:
         for cr_id in cr_ids:
             self.add_vote_same_pseudonym(cr_id)
         
-        final_ballots = self.pet()
+        final_ballots = self.check_valid_ballot()
         self.calculate_results(final_ballots)
 
     def verify_ballot_votes(self, ballot):
@@ -69,7 +69,7 @@ class Tally:
 
         return (final_ballot)
     
-    def pet(self):
+    def check_valid_ballot(self):
         final_ballots = self.bb.get_final_ballots()
         elgamal = self.bb.get_elgamal()
         elgamal_priv_key = self.bb.get_private_param("elgamal_priv_key")
@@ -77,15 +77,14 @@ class Tally:
         for ballot in final_ballots:
             total_votes = 0
             votes_valid = False
+            ballot_winner = None
             for candidate_id, candidate_data in ballot.items():
-                vote = Utility.decrypt(int(candidate_data[0]), int(candidate_data[1]),int(elgamal["group"]), int(elgamal["prime"]), int(elgamal_priv_key))
-                if vote not in [0, 1]:
-                    print(f"Invalid vote for candidate {candidate_id} in ballot {ballot}")
-                    break
-                if vote == 1:
+                if (Utility.pet(int(candidate_data[0]), int(candidate_data[1]), 1, int(elgamal["group"]), int(elgamal["prime"]), int(elgamal["public_key"]), int(elgamal_priv_key))):
                     votes_valid = True
                     ballot_winner = candidate_id
-                total_votes += vote
+                    total_votes += 1
+                elif (Utility.pet(int(candidate_data[0]), int(candidate_data[1]), 0, int(elgamal["group"]), int(elgamal["prime"]), int(elgamal["public_key"]), int(elgamal_priv_key))):
+                    votes_valid = True
             if votes_valid and total_votes in [0, 1]:
                 final_pet_ballots.append(ballot_winner)
         self.bb.set_pet_ballots(final_pet_ballots) # for testing
