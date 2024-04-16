@@ -32,6 +32,9 @@ setup-db:
 	docker run -d -p 27017:27017 --name m1 mongo
 #	python3.10 setup_db.py
 
+start-db:
+	docker start m1
+
 test:
 	pytest
 
