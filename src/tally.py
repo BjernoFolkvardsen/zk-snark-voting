@@ -1,5 +1,5 @@
 from src.bulletinboard import BullitinBoard
-from src.utility import Utility
+from src.utility import Utility, ElGamal
 from zkpy.circuit import Circuit, GROTH
 import random
 import json
@@ -43,6 +43,7 @@ class Tally:
         ballots = self.bb.get_ballot_by_cr_id(cr_id)
         elgamal = self.bb.get_elgamal()
         elgamal_priv_key = self.bb.get_private_param("elgamal_priv_key")
+        elGamal = Utility.constructElGamal((int(elgamal["prime"]), int(elgamal["group"]), int(elgamal["public_key"]), int(elgamal_priv_key)))
         x = 0
         final_ballot = {}
         for i in range(len(ballots)):
@@ -55,13 +56,13 @@ class Tally:
             else :
                 if self.verify_ballot_votes(ballots[i]["data"]):
                     for j in range(len(final_ballot)):
-                        final_ballot[j.__str__()] = Utility.homomorphic_addition(final_ballot[j.__str__()], ballots[i]["data"][j.__str__()]["vote"], int(elgamal["prime"]))
+                        c1,c2 = elGamal.homomorphic_addition((int(final_ballot[j.__str__()][0]),int(final_ballot[j.__str__()][1])), (int(ballots[i]["data"][j.__str__()]["vote"][0]), int(ballots[i]["data"][j.__str__()]["vote"][1])))
+                        final_ballot[j.__str__()] = (str(c1), str(c2))
 
         ## for test only
         final_ballot_decrypted = {}
         for j in range(len(final_ballot)):
-            final_ballot_decrypted[j.__str__()] = Utility.decrypt(int(final_ballot[j.__str__()][0]), int(final_ballot[j.__str__()][1]),int(elgamal["group"]),int(elgamal["prime"]),int(elgamal_priv_key))
-        
+            final_ballot_decrypted[j.__str__()] = str(elGamal.decrypt(int(final_ballot[j.__str__()][0]), int(final_ballot[j.__str__()][1])))
         self.bb.set_final_ballots_decrypted(final_ballot_decrypted, cr_id)
         ##***************
 
@@ -73,17 +74,18 @@ class Tally:
         final_ballots = self.bb.get_final_ballots()
         elgamal = self.bb.get_elgamal()
         elgamal_priv_key = self.bb.get_private_param("elgamal_priv_key")
+        elGamal = Utility.constructElGamal((int(elgamal["prime"]), int(elgamal["group"]), int(elgamal["public_key"]), int(elgamal_priv_key)))
         final_pet_ballots = []
         for ballot in final_ballots:
             total_votes = 0
             votes_valid = False
             ballot_winner = None
             for candidate_id, candidate_data in ballot.items():
-                if (Utility.pet(int(candidate_data[0]), int(candidate_data[1]), 1, int(elgamal["group"]), int(elgamal["prime"]), int(elgamal["public_key"]), int(elgamal_priv_key))):
+                if (elGamal.pet(int(candidate_data[0]), int(candidate_data[1]), 1)):
                     votes_valid = True
                     ballot_winner = candidate_id
                     total_votes += 1
-                elif (Utility.pet(int(candidate_data[0]), int(candidate_data[1]), 0, int(elgamal["group"]), int(elgamal["prime"]), int(elgamal["public_key"]), int(elgamal_priv_key))):
+                elif (elGamal.pet(int(candidate_data[0]), int(candidate_data[1]), 0)):
                     votes_valid = True
             if votes_valid and total_votes in [0, 1]:
                 final_pet_ballots.append(ballot_winner)

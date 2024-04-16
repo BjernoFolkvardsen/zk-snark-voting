@@ -8,8 +8,8 @@ import time
 if __name__ == "__main__":
 
     benchmark = []
-    for num_voters in [5, 10]: # 50, 100, 500, 1000, 5000, 10000, 50000, 100000]:
-        for num_candidates in [2, 5]:
+    for num_voters in [5]: # 50, 100, 500, 1000, 5000, 10000, 50000, 100000]:
+        for num_candidates in [2]:
             benchmark_data = {"num_voters": num_voters, "num_candidates": num_candidates, "start_time": 0, "end_time": 0, "time_taken_sec": 0, "time_taken_min": 0}
             # Clear DB before running
             client = pymongo.MongoClient("mongodb://localhost:27017/")

@@ -43,10 +43,7 @@ class VoterRegistration:
     
     def publish_merkletree(self):
         tuple_list = []
-        eligible_voters = self.bb.get_eligible_voters()
-        max_voter_num = len(eligible_voters)
-        treedepth = Utility.calc_tree_depth(max_voter_num)
-        for i in range(pow(2,treedepth)-max_voter_num):
+        for i in range(pow(2,Utility.MTREE_DEPTH)-Utility.MAX_NUMBER_OF_VOTERS):
             tuple_list.append({"tuple":("-1", "0")})
         self.bb.set_many_list_id_commitment(tuple_list)
         L = self.bb.get_list_id_commitment()

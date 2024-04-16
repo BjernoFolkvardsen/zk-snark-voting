@@ -1,51 +1,21 @@
 from Crypto.Random.random import getrandbits
-from Crypto.PublicKey import ElGamal
+from Crypto.Random import get_random_bytes
 from Crypto.Math.Numbers import Integer
-from Crypto.Math._IntegerCustom import IntegerCustom
+from Crypto.Util.number import inverse
+from Crypto.Math.Primality import ( test_probable_prime, COMPOSITE )
 from pyseidon.posiedon import Poseidon
 import random
 import math
 
-# Used to allow use of circom. See: https://docs.circom.io/circom-language/basic-operators/#field-elements
-GLOBAL_FIELD_P = 21888242871839275222246405745257275088548364400416034343698204186575808495617 # BN128
-MAX_NUMBER_OF_VOTERS = 1000
-
 class CouldNotDecrypt(Exception):
-    """Raise for fai decryption"""
-
+    """Raise for fail decryption"""
 
 class Utility :
-    @staticmethod
-    def encrypt(m, r:int, g:int,p:int,y:int):
-        c1 = pow(g.__int__(), r, p.__int__())
-        c2 = (pow(g.__int__(), m, p.__int__()) * pow(y.__int__(), r, p.__int__())) % p.__int__()
-        return c1, c2
-    
-    @staticmethod
-    def decrypt(c1:int, c2:int, g:int, p:int, x:int):
-        for i in range(MAX_NUMBER_OF_VOTERS):
-            if pow(g,i,p) == (c2 * pow(c1, -1*x, p)) % p :
-                return i
-        raise CouldNotDecrypt("Decryption of message failed! Message not in allowed massage space.")
-    
-    @staticmethod
-    def pet(a1, a2, m, g, p, y, x):
-        r = random.randint(1, p-2)
-        (b1,b2) = Utility.encrypt(m, r, g, p, y)
-        (c1, c2) = (a1* (pow(b1,(p-2), p)) % p), (a2 * (pow(b2,(p-2), p)) % p) 
-        # Math is from this paper: https://medium.com/@VitalikButerin/exploring-elliptic-curve-pairings-c73c1864e627
-        # curve point division
-        z = random.randint(1, p-2)  # Generate a random exponent z
-        (c1, c2) = (pow(c1, z, p), pow(c2, z, p))  # Blind the ciphertext
-        print("test:", (pow(c1, -1*x, p) * c2) % p)
-        return  (pow(c1, -1*x, p) * c2) % p == 1
 
-
-    @staticmethod
-    def homomorphic_addition(x:list[str,str], y:list[str,str], p:int):
-        (x1, x2) = x
-        (y1, y2) = y
-        return [str((int(x1) * int(y1)) % p), str((int(x2) * int(y2)) % p)]
+    # Used to allow use of circom. See: https://docs.circom.io/circom-language/basic-operators/#field-elements
+    GLOBAL_FIELD_P = 21888242871839275222246405745257275088548364400416034343698204186575808495617 # BN128
+    MAX_NUMBER_OF_VOTERS = 0
+    MTREE_DEPTH = 0
 
     @staticmethod
     def commit(m):
@@ -58,13 +28,15 @@ class Utility :
     def commit_verify(com,m,key):
         return com == hex(Poseidon().hash([m,key])) 
     
-    def calc_tree_depth(num_voters):
-        return math.ceil(math.log(num_voters,2))
-
     @staticmethod
-    def generateElGamalKey(randfunc):
-        """
-        Taken from https://github.com/Legrandin/pycryptodome/blob/master/lib/Crypto/PublicKey/ElGamal.py#L34-L94
+    def set_max_voters_and_mtree_depth(num_voters):
+        Utility.MAX_NUMBER_OF_VOTERS = num_voters
+        Utility.MTREE_DEPTH = math.ceil(math.log(num_voters,2))
+
+    # Generate an ElGamal key with N bits
+    @staticmethod
+    def generateElGamal(randfunc=get_random_bytes, p:int=None):
+        """Taken from https://github.com/Legrandin/pycryptodome/blob/master/lib/Crypto/PublicKey/ElGamal.py#L34-L94
         Randomly generate a fresh, new ElGamal key.
 
         The key will be safe for use for both encryption and signature
@@ -83,17 +55,19 @@ class Utility :
             an :class:`ElGamalKey` object
         """
 
-        obj=ElGamal.ElGamalKey()
-        
-        obj.p = IntegerCustom.from_bytes(GLOBAL_FIELD_P.to_bytes((GLOBAL_FIELD_P.bit_length() + 7) // 8, 'big'),byteorder="big")
-        q = (obj.p - 1) >> 1
+        obj=ElGamal(randfunc)
+
+        # Generate a safe prime p
+        # See Algorithm 4.86 in Handbook of Applied Cryptography
+        if p is None:
+            obj.p = Integer(Utility.GLOBAL_FIELD_P)
+        else:
+            obj.p = Integer(p)
 
         # Generate generator g
         while 1:
             # Choose a square residue; it will generate a cyclic group of order q.
-            obj.g = pow(Integer.random_range(min_inclusive=2,
-                                        max_exclusive=obj.p,
-                                        randfunc=randfunc), 2, obj.p)
+            obj.g = pow(Integer.random_range(min_inclusive=2, max_exclusive=obj.p-1, randfunc=randfunc), 2, obj.p)
 
             # We must avoid g=2 because of Bleichenbacher's attack described
             # in "Generating ElGamal signatures without knowning the secret key",
@@ -103,23 +77,151 @@ class Utility :
 
             # Discard g if it divides p-1 because of the attack described
             # in Note 11.67 (iii) in HAC
-            if (obj.p - 1) % obj.g == 0:
+            if (obj.p - Integer(1)) % obj.g == Integer(0):
                 continue
 
             # g^{-1} must not divide p-1 because of Khadir's attack
             # described in "Conditions of the generator for forging ElGamal
             # signature", 2011
             ginv = obj.g.inverse(obj.p)
-            if (obj.p - 1) % ginv == 0:
+            if (obj.p - Integer(1)) % ginv == Integer(0):
                 continue
 
             # Found
             break
 
         # Generate private key x
-        obj.x = Integer.random_range(min_inclusive=2,
-                                    max_exclusive=obj.p-1,
-                                    randfunc=randfunc)
+        obj.x = Integer.random_range(min_inclusive=2, max_exclusive=obj.p-1, randfunc=randfunc)
+
         # Generate public key y
         obj.y = pow(obj.g, obj.x, obj.p)
         return obj
+
+    @staticmethod
+    def constructElGamal(tup, randfunc=get_random_bytes):
+        """Taken from https://github.com/Legrandin/pycryptodome/blob/master/lib/Crypto/PublicKey/ElGamal.py
+        Construct an ElGamal from a tuple of valid ElGamal components.
+
+        The modulus *p* must be a prime.
+        The following conditions must apply:
+
+        .. math::
+
+            \begin{align}
+            &1 < g < p-1 \\
+            &g^{p-1} = 1 \text{ mod } 1 \\
+            &1 < x < p-1 \\
+            &g^x = y \text{ mod } p
+            \end{align}
+
+        Args:
+        tup (tuple):
+            A tuple with either 3 or 4 integers,
+            in the following order:
+
+            1. Modulus (*p*).
+            2. Generator (*g*).
+            3. Public key (*y*).
+            4. Private key (*x*). Optional.
+
+        Raises:
+            ValueError: when the key being imported fails the most basic ElGamal validity checks.
+
+        Returns:
+            an :class:`ElGamal` object
+        """
+
+        obj=ElGamal(randfunc)
+        if len(tup) not in [3,4]:
+            raise ValueError('argument for construct() wrong length')
+        for i in range(len(tup)):
+            field = obj._keydata[i]
+            setattr(obj, field, Integer(tup[i]))
+
+        fmt_error = test_probable_prime(obj.p) == COMPOSITE
+        fmt_error |= obj.g<=1 or obj.g>=obj.p
+        fmt_error |= pow(obj.g, obj.p-1, obj.p)!=1
+        fmt_error |= obj.y<1 or obj.y>=obj.p
+        if len(tup)==4:
+            fmt_error |= obj.x<=1 or obj.x>=obj.p
+            fmt_error |= pow(obj.g, obj.x, obj.p)!=obj.y
+
+        if fmt_error:
+            raise ValueError("Invalid ElGamal key components")
+
+        return obj
+
+class ElGamal():
+
+    p: Integer = None
+    g: Integer = None
+    x: Integer = None
+    y: Integer = None
+    randfunc:callable = None
+
+    #: Dictionary of ElGamal parameters.
+    #:
+    #: A public key will only have the following entries:
+    #:
+    #:  - **y**, the public key.
+    #:  - **g**, the generator.
+    #:  - **p**, the modulus.
+    #:
+    #: A private key will also have:
+    #:
+    #:  - **x**, the private key.
+    _keydata=['p', 'g', 'y', 'x']
+
+    def __init__(self, randfunc=get_random_bytes):
+        self.randfunc = randfunc
+
+    def can_decrypt(self):
+        return self.x is not None
+
+    def homomorphic_addition(self, e1:tuple[int,int], e2:tuple[int,int]):
+        (x1, x2) = e1
+        (y1, y2) = e2
+        c1 = (Integer(x1) * Integer(y1)) % self.p
+        c2 = (Integer(x2) * Integer(y2)) % self.p
+        return int(c1), int(c2)
+
+    def encrypt(self, m:int):
+        m = Integer(m)
+        r = Integer.random_range(min_inclusive=2, max_exclusive=self.p-1, randfunc=self.randfunc)
+        c1 = pow(self.g, r, self.p)
+        c2 = (pow(self.g, m, self.p) * pow(self.y, r, self.p)) % self.p
+        return int(c1), int(c2), int(r)
+
+    def decrypt(self, c1:int, c2:int):
+        if not self.can_decrypt():
+            raise CouldNotDecrypt("Can not decrypt without private key")
+        # Brute force decryption of possible positive messages
+        for i in range(Utility.MAX_NUMBER_OF_VOTERS):
+            if pow(self.g,Integer(i),self.p) == Integer(c2 * pow(c1, -1*int(self.x), int(self.p))) % self.p :
+                return i
+        # Brute force decryption of possible negative messages
+        for i in range(int(self.p)-10,int(self.p)-1):
+            if pow(self.g,Integer(i),self.p) == Integer(c2 * pow(c1, -1*int(self.x), int(self.p))) % self.p :
+                return i
+        raise CouldNotDecrypt("Decryption of message failed! Message not in allowed massage space.")
+
+    def pet(self, a1:int, a2:int, m:int):
+        if not self.can_decrypt():
+            raise CouldNotDecrypt("Can not decrypt without private key")
+        a1 = Integer(a1)
+        a2 = Integer(a2)
+        (b1,b2,r) = self.encrypt(m)
+        b1 = Integer(b1)
+        b2 = Integer(b2)
+        (c1, c2) = (a1* (pow(b1,(self.p-2), self.p)) % self.p), (a2 * (pow(b2,(self.p-2), self.p)) % self.p) 
+        # Math is from this paper: https://medium.com/@VitalikButerin/exploring-elliptic-curve-pairings-c73c1864e627
+        # curve point division
+        z = Integer.random_range(min_inclusive=2, max_exclusive=self.p-2, randfunc=self.randfunc)  # Generate a random exponent z
+        (c1, c2) = (pow(c1, z, self.p), pow(c2, z, self.p))  # Blind the ciphertext
+        return (int(c2) * pow(int(c1), -1*int(self.x), int(self.p))) % int(self.p) == 1
+
+    def make_proof_of_decryption():
+        pass
+
+    def verify_proof_of_decryption():
+        pass
