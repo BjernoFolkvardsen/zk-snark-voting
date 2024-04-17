@@ -21,7 +21,10 @@ class BullitinBoard:
             if args["type"] == "mongo_db":
                 self.path = "src/Data/test.json"
                 client = pymongo.MongoClient("mongodb://localhost:27017/")
-                self.db = client["db"]
+                if "db_name" in args:
+                    self.db = client[str(args["db_name"])]
+                else:
+                    self.db = client["db"]
                 self.db_type = "local_mongo_db"
             else:
                 self.db_type = "local_file"
@@ -242,6 +245,9 @@ class BullitinBoard:
     def set_result(self, result):
         self.set_data(result,collection_name="final_results", key="result")
 
-    def get_result(self, result):
-        return self.get_data(collection_name="final_results", key="result")
+    def get_result(self):
+        return self.get_data(collection_name="final_results", key="decrypted_results")
+    
+    def publish_decrypted_results(self, results_ballot_decrypted):
+        self.set_data(results_ballot_decrypted,collection_name="final_results", key="decrypted_results")
     

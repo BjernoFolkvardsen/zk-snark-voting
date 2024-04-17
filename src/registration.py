@@ -10,8 +10,8 @@ class VoterRegistration:
 
     bb: BullitinBoard = None
 
-    def __init__(self):
-        self.bb = BullitinBoard(env="local", args={"type": "mongo_db"})
+    def __init__(self, bb: BullitinBoard):
+        self.bb = bb
 
     def registration(self):
         eligible_voters = self.bb.get_eligible_voters()
@@ -45,7 +45,8 @@ class VoterRegistration:
         tuple_list = []
         for i in range(pow(2,Utility.MTREE_DEPTH)-Utility.MAX_NUMBER_OF_VOTERS):
             tuple_list.append({"tuple":("-1", "0")})
-        self.bb.set_many_list_id_commitment(tuple_list)
+        if tuple_list:
+            self.bb.set_many_list_id_commitment(tuple_list)
         L = self.bb.get_list_id_commitment()
         rt_L = MerklyTree(list(map(lambda x: int(x[1]), L)))
         signing_key = ECC.import_key(self.bb.get_private_param("signing_key"))
