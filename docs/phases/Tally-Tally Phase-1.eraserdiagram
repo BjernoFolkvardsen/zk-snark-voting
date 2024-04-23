@@ -1,0 +1,22 @@
+sequence-diagram
+
+title Tally Phase
+
+Tallier [icon: user-plus, color: darkorchid] > Python: Runs Tally(BB, sk_T)
+activate Tallier
+PostgreSQL (BB) [icon: database, color: green] > Python: Gets information of the ballots
+Python > Python: Verifies the ballots on BB and select ballots with valid proof
+Python > Python [icon: python, color: blue]: Compute final ballot using homomorphic encryption
+Python > Python: Shuffle and mix final ballots
+Python > Python: Publish ballots without cr_id and provides proof of correctness
+Python > Python: Apply PET on final ballots
+alt [label: if PET is passed] {
+  Python > Python: : Decrypt ballot
+}
+else [label: if PET is not passed] {
+    Python > Python: Invalid ballot notification
+}
+Python > PostgreSQL (BB): Publish decrypted ballots and proof of correct shuffle and decryption
+Tallier < Python: Tally done
+deactivate Tallier
+
