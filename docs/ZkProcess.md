@@ -43,9 +43,15 @@ circuit.export_vkey(output_file=working_dir+"vkey.json")
 # Verifies that a proof is valid.
 circuit.verify(GROTH, vkey_file=working_dir+"vkey.json", public_file=working_dir+"public.json", proof_file=working_dir+"proof.json")
 ```
-![Figure 1](/.eraser/G3dUXURUGn3xFGdR9Ux2___lqrF2i07Z8W7Qv7K4pe5Hkyjfqc2___---figure---dp4k0pMXyNjcXWji-09FM---figure---OAJm1qNsvBVzDa0xjVs0Ag.png "Figure 1")
+![Figure 1](/.eraser/G3dUXURUGn3xFGdR9Ux2___UydW6JsZqUfMKeGDrIN0gtNI4pO2___---figure---3tXun2eE7phQZryUEQqkd---figure---OAJm1qNsvBVzDa0xjVs0Ag.png "Figure 1")
 
 
 
 
+<!-- eraser-additional-content -->
+## Diagrams
+<!-- eraser-additional-files -->
+<a href="/docs/ZkProcess-flowchart-1.eraserdiagram" data-element-id="NZWhNJZ5OCRfTQWnqy08A"><img src="/.eraser/G3dUXURUGn3xFGdR9Ux2___UydW6JsZqUfMKeGDrIN0gtNI4pO2___---diagram----330a96ed3e8cba139b5d6fa0eabecdd0.png" alt="" data-element-id="NZWhNJZ5OCRfTQWnqy08A" /></a>
+<!-- end-eraser-additional-files -->
+<!-- end-eraser-additional-content -->
 <!--- Eraser file: https://app.eraser.io/workspace/G3dUXURUGn3xFGdR9Ux2 --->

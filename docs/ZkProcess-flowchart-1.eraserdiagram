@@ -1,0 +1,37 @@
+flowchart-diagram
+
+// Define Phases
+Setup {
+	 Circuit, CircomCompiler, R1cs, Wasm, Sym, Generate_witness.js, PtauCeremony, PtauFiles, Entropy, ContributePhase2, ZkSetup, Zkey(pkey), ExportVkey, Vkey
+}
+Voting {
+	 input.json, GenWitness, Witness.wtns, ZkProve, proof.json, public.json, Verify
+}
+// Define flow
+Circuit [icon: code] > CircomCompiler [icon: settings]
+CircomCompiler > R1cs [icon: file]
+CircomCompiler > Wasm [icon: file]
+CircomCompiler > Sym [icon: file]
+CircomCompiler > Generate_witness.js [icon: file]
+Generate_witness.js > GenWitness [icon: function]
+input.json [icon: data] > GenWitness [icon: function]
+Wasm > GenWitness [icon: function]
+GenWitness > Witness.wtns [icon: eye]
+PtauCeremony[icon: power] > PtauFiles [icon: file]
+R1cs > ZkSetup [icon: eye-off]
+PtauFiles > ZkSetup
+ZkSetup > Zkey(pkey) [icon: key]
+Zkey(pkey) > ContributePhase2 [icon: function]
+Entropy [icon: file-text] > ContributePhase2
+ContributePhase2 > Zkey(pkey) : updates key
+Witness.wtns > ZkProve [icon: eye-off]
+Zkey(pkey) > ZkProve
+ZkProve > proof.json [icon: data]
+ZkProve > public.json [icon: data]
+Zkey(pkey) > ExportVkey[icon: function]
+ExportVkey > Vkey [icon: key]
+Vkey > Verify [icon: check]
+public.json > Verify
+proof.json > Verify
+
+
