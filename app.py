@@ -8,6 +8,53 @@ from src.verification import Verification
 import pymongo
 import time
 import io
+import csv
+
+def run_election(num_voters,num_candidates,benchmark):
+    benchmark_data = {"num_voters": num_voters, "num_candidates": num_candidates, "start_time": 0, "setup_time": 0, "registration_time": 0, "voting_time": 0, "tally_time": 0, "end_time": 0, "setup_time_taken_sec": 0, "setup_time_taken_min": 0, "registration_time_taken_sec": 0, "registration_time_taken_min": 0, "voting_time_taken_sec": 0, "voting_time_taken_min": 0, "tally_time_taken_sec": 0, "tally_time_taken_min": 0, "total_time_taken_sec": 0, "total_time_taken_min": 0}
+    db_name = "db_"+str(num_voters)+"_"+str(num_candidates)
+    # Clear DB before running
+    client = pymongo.MongoClient("mongodb://localhost:27017/")
+    client.drop_database(db_name)
+
+    bb = BullitinBoard(env="local", args={"type": "mongo_db", "db_name": db_name})
+
+    start_time = time.time()
+    ## Normal Protocol Flow
+    setup_manager = SetupManager(bb, dummy_data={"num_voters": num_voters, "num_candidates": num_candidates})
+    setup_time = time.time()
+    registration_manager = VoterRegistration(bb)
+    registration_manager.registration()
+    registration_time = time.time()
+    voting_manager = Voting(bb)
+    voting_manager.voting()
+    voting_time = time.time()
+    tally_manager = Tally(bb)
+    tally_manager.tally()
+    tally_time = time.time()
+    # verfication_manager = Verification(bb)
+    # verfication_manager.verify_tally()
+
+    end_time = time.time()
+    benchmark_data["start_time"] = start_time
+    benchmark_data["setup_time"] = setup_time
+    benchmark_data["registration_time"] = registration_time
+    benchmark_data["voting_time"] = voting_time
+    benchmark_data["tally_time"] = tally_time
+    benchmark_data["end_time"] = end_time
+    benchmark_data["setup_time_taken_sec"] = setup_time - start_time
+    benchmark_data["setup_time_taken_min"] = (setup_time - start_time)/60
+    benchmark_data["registration_time_taken_sec"] = registration_time - setup_time
+    benchmark_data["registration_time_taken_min"] = (registration_time - setup_time)/60
+    benchmark_data["voting_time_taken_sec"] = voting_time - registration_time
+    benchmark_data["voting_time_taken_min"] = (voting_time - registration_time)/60
+    benchmark_data["tally_time_taken_sec"] = tally_time - voting_time
+    benchmark_data["tally_time_taken_min"] = (tally_time - voting_time)/60
+    benchmark_data["total_time_taken_sec"] = end_time - start_time
+    benchmark_data["total_time_taken_min"] = (end_time - start_time)/60
+    benchmark.append(benchmark_data)
+    return benchmark
+
 
 if __name__ == "__main__":
 
@@ -95,41 +142,26 @@ if __name__ == "__main__":
     # print(table, table_full, table_setup, table_registration, table_voting, table_tally)
     # raise Exception("Please run the code in the following order: python3 app.py")
     benchmark = []
-    for num_voters in [3, 5]: #, 10, 25, 50]: #, 100, 500, 1000, 5000, 10000, 50000, 100000]:
-        for num_candidates in [2, 3]: #, 5, 10]:
-            benchmark_data = {"num_voters": num_voters, "num_candidates": num_candidates, "start_time": 0, "end_time": 0, "time_taken_sec": 0, "time_taken_min": 0}
-            db_name = "db_"+str(num_voters)+"_"+str(num_candidates)
-            # Clear DB before running
-            client = pymongo.MongoClient("mongodb://localhost:27017/")
-            client.drop_database(db_name)
+    for num_voters in [5, 10, 100, 1000, 10000, 100000, 1000000]:
+        for num_candidates in [2, 5, 10, 50, 100, 150 ]:
+           benchmark = run_election(num_voters, num_candidates, benchmark)
 
-            bb = BullitinBoard(env="local", args={"type": "mongo_db", "db_name": db_name})
+    # Københavns Storkreds valg 2022, 549.738 voters, 131 candidates
+    benchmark = run_election(549738, 131, benchmark)
 
-            start_time = time.time()
-            ## Normal Protocol Flow
-            setup_manager = SetupManager(bb, dummy_data={"num_voters": num_voters, "num_candidates": num_candidates})
-            registration_manager = VoterRegistration(bb)
-            registration_manager.registration()
-            voting_manager = Voting(bb)
-            voting_manager.voting()
-            tally_manager = Tally(bb)
-            tally_manager.tally()
-            verfication_manager = Verification(bb)
-            verfication_manager.verify_tally()
+    # table = PrettyTable()
+    # table.field_names = ["Number of voters", "Number of candidates", "Time taken (sec)", "Time taken (min)"]
+    # table.field_names = ["Number of voters", "Number of candidates", "Time taken (sec)", "Time taken (min)"]
+    # for row in benchmark:
+    #     table.add_row([row["num_voters"], row["num_candidates"], row["time_taken_sec"], row["time_taken_min"]])
+    # print(table)
 
-            end_time = time.time()
-            benchmark_data["start_time"] = start_time
-            benchmark_data["end_time"] = end_time
-            benchmark_data["time_taken_sec"] = end_time - start_time
-            benchmark_data["time_taken_min"] = (end_time - start_time)/60
-            benchmark.append(benchmark_data)
+    keys_list = ["num_voters", "num_candidates", "start_time", "setup_time", "registration_time", "voting_time", "tally_time", "end_time", "setup_time_taken_sec", "setup_time_taken_min", "registration_time_taken_sec", "registration_time_taken_min", "voting_time_taken_sec", "voting_time_taken_min", "tally_time_taken_sec", "tally_time_taken_min", "total_time_taken_sec", "total_time_taken_min"]
+    with open('benchmark_0_revote_and_0_nullvote.csv', 'w', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames = keys_list)
 
-    table = PrettyTable()
-    table.field_names = ["Number of voters", "Number of candidates", "Time taken (sec)", "Time taken (min)"]
-    table.field_names = ["Number of voters", "Number of candidates", "Time taken (sec)", "Time taken (min)"]
-    for row in benchmark:
-        table.add_row([row["num_voters"], row["num_candidates"], row["time_taken_sec"], row["time_taken_min"]])
-    print(table)
+        writer.writeheader()
+        writer.writerows(benchmark)
 
     ## ZK-SNARK testing flow
     # setup_manager = SetupManager()

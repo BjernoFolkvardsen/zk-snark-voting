@@ -1,8 +1,11 @@
-from src.bulletinboard import Bulletinboard
+from src.bulletinboard import BullitinBoard
 from src.tally import Tally
 
 class Verification:
-    def __init__(self):
+
+    bb: BullitinBoard = None
+    
+    def __init__(self, bb: BullitinBoard):
         pass
 
     def verify_tally(self, result, proof):

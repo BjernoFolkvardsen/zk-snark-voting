@@ -42,14 +42,14 @@ class BullitinBoard:
             vote = {"voterId": str(i), "vote": random.choice(candidates)["id"]}
             votes.append(vote)
 
-        num_re_votes = random.randint(1, num_voters//2)
+        # num_re_votes = random.randint(1, num_voters//2)
 
-        for i in range(num_re_votes):
-            re_vote_candidate = random.choice(candidates)["id"]
-            while re_vote_candidate == votes[i]["vote"]:
-                re_vote_candidate = random.choice(candidates)["id"]
-            re_vote = {"voterId": str(i), "re-vote": re_vote_candidate}
-            votes[i].update(re_vote)
+        # for i in range(num_re_votes):
+        #     re_vote_candidate = random.choice(candidates)["id"]
+        #     while re_vote_candidate == votes[i]["vote"]:
+        #         re_vote_candidate = random.choice(candidates)["id"]
+        #     re_vote = {"voterId": str(i), "re-vote": re_vote_candidate}
+        #     votes[i].update(re_vote)
 
         self.set_data(eligible_voters, collection_name="eligible_voters", many=True)
         self.set_data(candidates, collection_name="candidates", many=True)

@@ -20,8 +20,8 @@ class Voting:
         group = int(elgamal["group"])
         public_key = int(elgamal["public_key"])
         for voter in voters:
-            for i in range(0, random.randint(1, 2)):
-                    self.null_votes(prime,group, public_key)
+            # for i in range(0, random.randint(1, 2)):
+            #         self.null_votes(prime,group, public_key)
             for vote in votes_made:
                 if voter["id"] == vote["voterId"] :
                     self.vote(voter["id"], voter["t_id"], voter["cr_id"], public_key, vote["vote"], prime, group)
