@@ -37,7 +37,19 @@ class BullitinBoard:
 
         candidates = [{"id": str(i), "candidate": fake.name()} for i in range(num_candidates)]
 
-        votes = [{"voterId": str(i), "vote": random.choice(candidates)["id"]} for i in range(num_voters)]
+        votes = []
+        for i in range(num_voters):
+            vote = {"voterId": str(i), "vote": random.choice(candidates)["id"]}
+            votes.append(vote)
+
+        num_re_votes = random.randint(1, num_voters//2)
+
+        for i in range(num_re_votes):
+            re_vote_candidate = random.choice(candidates)["id"]
+            while re_vote_candidate == votes[i]["vote"]:
+                re_vote_candidate = random.choice(candidates)["id"]
+            re_vote = {"voterId": str(i), "re-vote": re_vote_candidate}
+            votes[i].update(re_vote)
 
         self.set_data(eligible_voters, collection_name="eligible_voters", many=True)
         self.set_data(candidates, collection_name="candidates", many=True)
@@ -233,6 +245,9 @@ class BullitinBoard:
     def set_result(self, result):
         self.set_data(result,collection_name="final_results", key="result")
 
-    def get_result(self, result):
-        return self.get_data(collection_name="final_results", key="result")
+    def get_result(self):
+        return self.get_data(collection_name="final_results", key="decrypted_results")
+    
+    def publish_decrypted_results(self, results_ballot_decrypted):
+        self.set_data(results_ballot_decrypted,collection_name="final_results", key="decrypted_results")
     

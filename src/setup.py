@@ -1,5 +1,4 @@
 from Crypto.PublicKey import ECC
-from Crypto.Random import get_random_bytes
 from Crypto.Signature import eddsa
 from zkpy.ptau import PTau
 from zkpy.circuit import Circuit, GROTH
@@ -26,7 +25,7 @@ class SetupManager:
 
     def setup_elgamal(self):
 
-        ElGamalKey = Utility.generateElGamalKey(get_random_bytes)
+        ElGamalKey = Utility.generateElGamal()
 
         self.bb.set_elgamal(str(ElGamalKey.y), str(ElGamalKey.p), str(ElGamalKey.g))
         self.bb.set_private_param("elgamal_priv_key", str(ElGamalKey.x))
@@ -46,8 +45,8 @@ class SetupManager:
 
     def setup_zk_SNARK(self):
         eligible_voters = self.bb.get_eligible_voters()
-        treedepth = Utility.calc_tree_depth(len(eligible_voters))
-        if treedepth > 30:
+        Utility.set_max_voters_and_mtree_depth(len(eligible_voters))
+        if Utility.MTREE_DEPTH > 30:
             raise Exception("Too many voters for the zk-SNARK proof. The maximum number of voters is 2^30.")
         working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/FullCircuit/"
         ptau = PTau(ptau_file=working_dir+"../ptau_13.ptau")
@@ -56,7 +55,7 @@ class SetupManager:
             with open(working_dir+"circuit.circom", "w") as f1:
                 for line in f:
                     f1.write(line)
-                f1.write("component main {public [pk_t, g, e_v, cr_id, pathIndices, siblings, root]} = ZkSnarkProof("+str(treedepth)+");")
+                f1.write("component main {public [pk_t, g, e_v, cr_id, pathIndices, siblings, root]} = ZkSnarkProof("+str(Utility.MTREE_DEPTH)+");")
         
         circuit = Circuit("circuit.circom", working_dir=working_dir,output_dir=working_dir)
         circuit.compile()

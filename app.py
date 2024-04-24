@@ -4,6 +4,7 @@ from src.registration import VoterRegistration
 from src.voting import Voting
 from src.tally import Tally
 from prettytable import PrettyTable
+from src.verification import Verification
 import pymongo
 import time
 import io
@@ -113,6 +114,8 @@ if __name__ == "__main__":
             voting_manager.voting()
             tally_manager = Tally(bb)
             tally_manager.tally()
+            verfication_manager = Verification(bb)
+            verfication_manager.verify_tally()
 
             end_time = time.time()
             benchmark_data["start_time"] = start_time

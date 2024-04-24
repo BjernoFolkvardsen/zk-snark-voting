@@ -1,5 +1,5 @@
 from src.bulletinboard import BullitinBoard
-from src.utility import Utility
+from src.utility import Utility, ElGamal
 from zkpy.circuit import Circuit, GROTH
 import random
 import json
@@ -21,7 +21,7 @@ class Tally:
         for cr_id in cr_ids:
             self.add_vote_same_pseudonym(cr_id)
         
-        final_ballots = self.pet()
+        final_ballots = self.check_valid_ballot()
         self.calculate_results(final_ballots)
 
     def verify_ballot_votes(self, ballot):
@@ -43,6 +43,7 @@ class Tally:
         ballots = self.bb.get_ballot_by_cr_id(cr_id)
         elgamal = self.bb.get_elgamal()
         elgamal_priv_key = self.bb.get_private_param("elgamal_priv_key")
+        elGamal = Utility.constructElGamal((int(elgamal["prime"]), int(elgamal["group"]), int(elgamal["public_key"]), int(elgamal_priv_key)))
         x = 0
         final_ballot = {}
         for i in range(len(ballots)):
@@ -55,13 +56,13 @@ class Tally:
             else :
                 if self.verify_ballot_votes(ballots[i]["data"]):
                     for j in range(len(final_ballot)):
-                        final_ballot[j.__str__()] = Utility.homomorphic_addition(final_ballot[j.__str__()], ballots[i]["data"][j.__str__()]["vote"], int(elgamal["prime"]))
+                        c1,c2 = elGamal.homomorphic_addition((int(final_ballot[j.__str__()][0]),int(final_ballot[j.__str__()][1])), (int(ballots[i]["data"][j.__str__()]["vote"][0]), int(ballots[i]["data"][j.__str__()]["vote"][1])))
+                        final_ballot[j.__str__()] = (str(c1), str(c2))
 
         ## for test only
         final_ballot_decrypted = {}
         for j in range(len(final_ballot)):
-            final_ballot_decrypted[j.__str__()] = Utility.decrypt(int(final_ballot[j.__str__()][0]), int(final_ballot[j.__str__()][1]),int(elgamal["group"]),int(elgamal["prime"]),int(elgamal_priv_key))
-        
+            final_ballot_decrypted[j.__str__()] = str(elGamal.decrypt(int(final_ballot[j.__str__()][0]), int(final_ballot[j.__str__()][1])))
         self.bb.set_final_ballots_decrypted(final_ballot_decrypted, cr_id)
         ##***************
 
@@ -69,46 +70,78 @@ class Tally:
 
         return (final_ballot)
     
-    def pet(self):
+    def check_valid_ballot(self):
         final_ballots = self.bb.get_final_ballots()
         elgamal = self.bb.get_elgamal()
         elgamal_priv_key = self.bb.get_private_param("elgamal_priv_key")
-        final_pet_ballots = []
+        elGamal = Utility.constructElGamal((int(elgamal["prime"]), int(elgamal["group"]), int(elgamal["public_key"]), int(elgamal_priv_key)))
+        final_valid_ballots = []
+        # print("final_ballots: ", final_ballots)
+        # print()
         for ballot in final_ballots:
-            total_votes = 0
             votes_valid = False
             for candidate_id, candidate_data in ballot.items():
-                vote = Utility.decrypt(int(candidate_data[0]), int(candidate_data[1]),int(elgamal["group"]), int(elgamal["prime"]), int(elgamal_priv_key))
-                if vote not in [0, 1]:
-                    print(f"Invalid vote for candidate {candidate_id} in ballot {ballot}")
-                    break
-                if vote == 1:
+                if (elGamal.pet(int(candidate_data[0]), int(candidate_data[1]), 1)):
                     votes_valid = True
-                    ballot_winner = candidate_id
-                total_votes += vote
-            if votes_valid and total_votes in [0, 1]:
-                final_pet_ballots.append(ballot_winner)
-        self.bb.set_pet_ballots(final_pet_ballots) # for testing
-        return final_pet_ballots
+                elif (elGamal.pet(int(candidate_data[0]), int(candidate_data[1]), 0)):
+                    votes_valid = True
+            
+            ballot_sum_encrypted = self.get_ballot_sum(ballot, elGamal)
+            if (elGamal.pet(int(ballot_sum_encrypted[0]), int(ballot_sum_encrypted[1]), 1)):
+                votes_valid = True
+            elif (elGamal.pet(int(ballot_sum_encrypted[0]), int(ballot_sum_encrypted[1]), 0)):
+                votes_valid = True
+            
+            if votes_valid:
+                final_valid_ballots.append(ballot)
+        return final_valid_ballots
 
-    def calculate_results(self, final_ballots):
+    def calculate_results(self, valid_ballots):
+        elgamal = self.bb.get_elgamal()
+        elgamal_priv_key = self.bb.get_private_param("elgamal_priv_key")
+        elGamal = Utility.constructElGamal((int(elgamal["prime"]), int(elgamal["group"]), int(elgamal["public_key"]), int(elgamal_priv_key)))
+        # print("valid_ballots: ", valid_ballots)
         candidates = self.bb.get_candidates()
-        results = {str(candidate["id"]): 0 for candidate in candidates}  
+        results = {str(candidate["id"]): 0 for candidate in candidates}
         id_to_name = {str(candidate["id"]): candidate["candidate"] for candidate in candidates}
 
-        for candidate_id in final_ballots:
-            results[str(candidate_id)] += 1
+        first_ballot = True
+        for ballot in valid_ballots:
+            if first_ballot:
+                results_ballot = ballot
+                first_ballot = False
+            else:
+                for candidate_id, candidate_data in ballot.items():
+                    results_ballot[candidate_id] = elGamal.homomorphic_addition((int(results_ballot[candidate_id][0]), int(results_ballot[candidate_id][1])), (int(candidate_data[0]), int(candidate_data[1])))
+        
+        # print("results_ballot: ", results_ballot)
 
-        results_with_names = {id_to_name[id]: count for id, count in results.items()}
+        results_ballot_decrypted = {}
+        results = {}
+        for candidate_id, candidate_data in results_ballot.items():
+            decrypted_votes_count = elGamal.decrypt(int(candidate_data[0]), int(candidate_data[1]))
+            results[candidate_id] = decrypted_votes_count
+            results_ballot_decrypted[candidate_id] = {}
+            results_ballot_decrypted[candidate_id]['number_of_votes'] = str(decrypted_votes_count)
+        # print("results_ballot_decrypted: ", results_ballot_decrypted)
+
+        results_with_names = {id_to_name[id]: result['number_of_votes'] for id, result in results_ballot_decrypted.items()}
 
         highest_number = max(results, key=results.get)
         winner = next((candidate for candidate in candidates if str(candidate["id"]) == highest_number), None)
 
+        self.bb.publish_decrypted_results(results_ballot_decrypted)
         self.bb.set_winner(highest_number, winner)
         self.bb.set_result(results_with_names)
-        return results, highest_number, winner["candidate"] if winner else None
-
-
+        return results_ballot_decrypted, highest_number, winner["candidate"] if winner else None
     
+    def get_ballot_sum(self, ballot, elGamal: ElGamal):
+        first_item = True
+        for candidate_id, candidate_data in ballot.items():
+            if first_item:
+                ballot_sum_encrypted = candidate_data
+                first_item = False
+            else:
+                ballot_sum_encrypted= elGamal.homomorphic_addition((int(ballot_sum_encrypted[0]), int(ballot_sum_encrypted[1])), (int(candidate_data[0]), int(candidate_data[1])))
 
-    
+        return ballot_sum_encrypted
