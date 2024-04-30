@@ -141,13 +141,18 @@ if __name__ == "__main__":
     # table.add_column("Time (min)", [0.1666667, 0.3333333, 0.5, 0.6666667, 0.8333333, 1])
     # print(table, table_full, table_setup, table_registration, table_voting, table_tally)
     # raise Exception("Please run the code in the following order: python3 app.py")
+    keys_list = ["num_voters", "num_candidates", "start_time", "setup_time", "registration_time", "voting_time", "tally_time", "end_time", "setup_time_taken_sec", "setup_time_taken_min", "registration_time_taken_sec", "registration_time_taken_min", "voting_time_taken_sec", "voting_time_taken_min", "tally_time_taken_sec", "tally_time_taken_min", "total_time_taken_sec", "total_time_taken_min"]
     benchmark = []
-    for num_voters in [5, 10, 100, 1000, 10000, 100000, 1000000]:
-        for num_candidates in [2, 5, 10, 50, 100, 150 ]:
+    for num_voters in [1000]: #, 10000, 100000, 1000000]:
+        for num_candidates in [10]: #, 50, 100, 150 ]:
            benchmark = run_election(num_voters, num_candidates, benchmark)
+           with open( str(num_voters)+'_'+str(num_candidates)+'_benchmark_0_revote_and_0_nullvote.csv', 'w', newline='') as file:
+                writer = csv.DictWriter(file, fieldnames = keys_list)
+                writer.writeheader()
+                writer.writerows(benchmark)
 
     # Københavns Storkreds valg 2022, 549.738 voters, 131 candidates
-    benchmark = run_election(549738, 131, benchmark)
+    # benchmark = run_election(549738, 131, benchmark)
 
     # table = PrettyTable()
     # table.field_names = ["Number of voters", "Number of candidates", "Time taken (sec)", "Time taken (min)"]
@@ -155,9 +160,7 @@ if __name__ == "__main__":
     # for row in benchmark:
     #     table.add_row([row["num_voters"], row["num_candidates"], row["time_taken_sec"], row["time_taken_min"]])
     # print(table)
-
-    keys_list = ["num_voters", "num_candidates", "start_time", "setup_time", "registration_time", "voting_time", "tally_time", "end_time", "setup_time_taken_sec", "setup_time_taken_min", "registration_time_taken_sec", "registration_time_taken_min", "voting_time_taken_sec", "voting_time_taken_min", "tally_time_taken_sec", "tally_time_taken_min", "total_time_taken_sec", "total_time_taken_min"]
-    with open('benchmark_0_revote_and_0_nullvote.csv', 'w', newline='') as file:
+    with open('100_1000_benchmark_0_revote_and_0_nullvote.csv', 'w', newline='') as file:
         writer = csv.DictWriter(file, fieldnames = keys_list)
 
         writer.writeheader()
