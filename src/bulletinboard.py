@@ -30,7 +30,7 @@ class BullitinBoard:
                 self.db_type = "local_file"
                 self.path = "src/Data/data.json"
 
-    def generate_data(self, num_voters=4, num_candidates=2):
+    def generate_data(self, num_voters=4, num_candidates=2, re_vote_percent=1):
         fake = Faker()
 
         eligible_voters = [{"id": str(i), "name": fake.first_name()} for i in range(num_voters)]
@@ -42,14 +42,14 @@ class BullitinBoard:
             vote = {"voterId": str(i), "vote": random.choice(candidates)["id"]}
             votes.append(vote)
 
-        # num_re_votes = random.randint(1, num_voters//2)
+        num_re_votes = round(num_voters * re_vote_percent)
 
-        # for i in range(num_re_votes):
-        #     re_vote_candidate = random.choice(candidates)["id"]
-        #     while re_vote_candidate == votes[i]["vote"]:
-        #         re_vote_candidate = random.choice(candidates)["id"]
-        #     re_vote = {"voterId": str(i), "re-vote": re_vote_candidate}
-        #     votes[i].update(re_vote)
+        for i in range(num_re_votes):
+            re_vote_candidate = random.choice(candidates)["id"]
+            while re_vote_candidate == votes[i]["vote"]:
+                re_vote_candidate = random.choice(candidates)["id"]
+            re_vote = {"voterId": str(i), "re-vote": re_vote_candidate}
+            votes[i].update(re_vote)
 
         self.set_data(eligible_voters, collection_name="eligible_voters", many=True)
         self.set_data(candidates, collection_name="candidates", many=True)

@@ -11,10 +11,8 @@ class SetupManager:
 
     bb: BullitinBoard = None
 
-    def __init__(self, bb: BullitinBoard, dummy_data=False):
+    def __init__(self, bb: BullitinBoard):
         self.bb = bb
-        if dummy_data:
-            self.bb.generate_data(num_voters=dummy_data["num_voters"], num_candidates=dummy_data["num_candidates"])
         self.setup()
     
     def setup(self):
