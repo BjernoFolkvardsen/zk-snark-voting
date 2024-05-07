@@ -20,16 +20,16 @@ class Voting:
         group = int(elgamal["group"])
         public_key = int(elgamal["public_key"])
         for voter in voters:
-            # for i in range(0, random.randint(1, 2)):
-            #         self.null_votes(prime,group, public_key)
             for vote in votes_made:
                 if voter["id"] == vote["voterId"] :
                     self.vote(voter["id"], voter["t_id"], voter["cr_id"], public_key, vote["vote"], prime, group)
                     self.verify_vote_on_bb(voter["cr_id"])
-                    
+
                     if "re-vote" in vote:
                         self.change_vote(voter["id"], voter["t_id"], voter["cr_id"], public_key, vote["re-vote"], prime, group, vote["vote"])
-                        break
+
+                    if "null-vote" in vote:
+                        self.null_votes(prime, group, public_key)
 
 
     def vote(self, id, t_id, cr_id, pk_T, v_id, p, g):
