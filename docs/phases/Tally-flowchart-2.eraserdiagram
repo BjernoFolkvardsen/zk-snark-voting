@@ -1,21 +1,18 @@
 flowchart-diagram
 
 // Define nodes and relationships "A > B"
-Title Flow chart of tally phase
 // Set shape and icon properties in "[]"
-Tally(BB; sk_T) [ icon: function, color: blue] > Verifies ballots on BB [icon: function, color: blue], Selects ballots with walid proof [icon: function, color: blue]
-Bulletin Board [shape: cylinder, icon: database, color: green]> Tally(BB; sk_T)
-sk_T [shape: oval, icon: key, color: orange] > Tally(BB; sk_T)
-Selects ballots with walid proof, Verifies ballots on BB > Computes final ballot for each cr_id with homomorphic encryption [icon: function, color: blue]
-cr_id [shape: oval, icon: data, color: orange] > Computes final ballot for each cr_id with homomorphic encryption 
-Computes final ballot for each cr_id with homomorphic encryption > List of final ballots [shape: oval, icon: list, color: orange]
-List of final ballots > Shuffle and mix [icon: function, color: blue]
-Shuffle and mix > Publish ballots without cr_id and provide proof of corretness
-Proof of correctness [ icon: function, color: blue] > Publish ballots without cr_id and provide proof of corretness [icon: function, color: blue]
-List of final ballots >Applies PET on final ballots [icon: function, color: blue]
-Applies PET on final ballots > Ballots which pass PET[shape: oval, color: orange, icon: list], Ballots which does not pass PET [shape: oval, color: orange, icon: list]
-Ballots which pass PET > Proof of correctness
-Ballots which does not pass PET > Reject[icon: function, color: blue]
-Publish ballots without cr_id and provide proof of corretness > Decrypt ballots [icon: function, color: blue]
+Tally(BB; sk_T) [ icon: function, color: gray] > Verifies ballots from BB and selects ballots with valid proof [icon: function, color: gray]
+Bulletin Board [shape: cylinder, icon: database, color: black]> Tally(BB; sk_T)
+sk_T [shape: oval, icon: key] > Tally(BB; sk_T)
+Verifies ballots from BB and selects ballots with valid proof  > Computes final ballot for each cr_id with homomorphic encryption [icon: function, color: gray]
+Computes final ballot for each cr_id with homomorphic encryption > List of final ballots [shape: oval, icon: list]
+List of valid final ballots[shape: oval, icon: list] > Shuffle and mix [icon: function, color: gray]
+Shuffle and mix > Publish ballots without cr_id and provide proof of corretness [icon: function, color: gray]
+List of final ballots >Applies PET on final ballots [icon: function, color: gray]
+Applies PET on final ballots > Ballots which pass PET[shape: oval, icon: list], Ballots which does not pass PET [shape: oval, icon: list]
+Ballots which pass PET > List of valid final ballots
+Ballots which does not pass PET > Reject[icon: function, color: gray]
+Publish ballots without cr_id and provide proof of corretness > Bulletin Board, Decrypt ballots [icon: function, color: gray]
 Decrypt ballots > Publish result with proof decryption
-Publish result with proof decryption [icon: function, color: blue] > Bulletin Board
+Publish result with proof decryption [icon: function, color: gray] > Bulletin Board
