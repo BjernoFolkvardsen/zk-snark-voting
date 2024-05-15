@@ -1,0 +1,23 @@
+flowchart-diagram
+
+RegisterVoter(id) < Voter[shape: document , icon: user-check, color: darkgrey]
+RegisterVoter(id) [icon: function, color: grey] > Bulletin Board [shape: cylinder, icon: database, color: black]
+Bulletin Board > PP [shape: oval, icon: data, ]
+PP > Commit(PP; cr_id) [icon: function, color: grey]
+RegisterVoter(id) > GetRandomPseudonym()[icon: function, color: grey]
+GetRandomPseudonym() > cr_id [shape: oval, icon: data, ] > Commit(PP; cr_id)
+Commit(PP; cr_id) > (t_id; c_id) [shape: oval, icon: data, ]
+(t_id; c_id)  > Bulletin Board
+Bulletin Board > Registrar
+
+Registrar [shape: document, icon: user, color: darkgrey] > Register(id; c_id; L) [icon: function, color: grey]: Calls with id; c_id;
+Bulletin Board > L [shape: oval, icon: list, ]
+L > Register(id; c_id; L)
+Register(id; c_id; L) > L((id_1;c_id_1);...;(id_n-1;c_id_n-1))[shape: oval, icon: list, ]: Adds (id,c_id) to the list L
+L((id_1;c_id_1);...;(id_n-1;c_id_n-1)) > ComputeMekleTreeRoot(L)[icon: function, color: grey]
+L((id_1;c_id_1);...;(id_n-1;c_id_n-1)) > ComputeSignature(L; rt_L; sk_σ)[icon: function, color: grey]
+ComputeMekleTreeRoot(L) > rt_L[shape: oval, icon: data, ]
+rt_L > ComputeSignature(L; rt_L; sk_σ)
+Registrar > sk_σ[shape: oval, icon: key, ] > ComputeSignature(L; rt_L; sk_σ)
+ComputeSignature(L; rt_L; sk_σ) > (L; rt_L; σ)[shape: oval, icon: data, ]
+(L; rt_L; σ) > Bulletin Board

@@ -1,0 +1,24 @@
+sequence-diagram
+
+title Registration Phase
+activate Voter
+Voter [icon: user-check, color: darkorchid] > Python[icon: python, color: blue]: runs RegisterVoter(id) 
+Python > Python: Select voting pseudonym cr_id
+Python > Python: Compute commitment c_id = H(cr_id,t_id)
+Python > Voter: Returns (c_id, cr_id, t_id)
+Voter > Registrar [icon: user, color: darkorchid]: Send (id,c_id)
+deactivate Voter
+activate Registrar
+Registrar > Python: Register(id,c_id, L): appends (id,c_id) to list L
+Python > Python: Compute Merkle tree root rtL
+Python > Python: Computer signature σ from secret resigtrar key skσ
+Python > Python: Sign L and rtL
+Python > Registrar: Returns (L, rt_L, σ)
+Registrar > PostgreSQL (BB) [icon: database, color: green]: Publish (L, rt_L, σ)
+deactivate Registrar
+opt [label: verify]{
+Voter > PostgreSQL (BB): Verify c_id in L and rt_L
+}
+opt [label: verify]{
+Anyone[icon: users, color: darkorchid] > PostgreSQL (BB): Verify rt_L is correctly built from the signed list L
+}
