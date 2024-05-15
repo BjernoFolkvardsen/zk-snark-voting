@@ -1,0 +1,36 @@
+sequence-diagram
+
+title Voting phase
+activate Voter
+Voter [icon: user-check, color: darkorchid] > Python [icon: python, color: blue]: Runs Vote(id, (sk_id = cr_id, t_id)), pk_T, v)
+Python > Python: Computes e_v = enc_pk_T(v;r) 
+opt [label: Case of nullifying previous vote v_pre to vote for v_new] {
+Voter > Python: v = v_new-v_pre
+}
+Python > Python: Computes zero-knowledge proof π_id with the proving key pk
+Python > Anonnymous Channel [icon: eye-off, color: blue]: Submit ballot β
+Anonnymous Channel > PostgreSQL (BB) [icon: database, color: green]: Forward ballot β
+deactivate Voter
+activate PostgreSQL (BB)
+PostgreSQL (BB) > Python: Runs Validate(β)
+Python > Python: Checks if proof on ballot is valid, and if ballot already exists on BB
+
+alt [label: if valid] {
+    Python > Python: Append(BB, β)
+    Python > PostgreSQL (BB): Append β
+    Python > PostgreSQL (BB): : Verify β is appended
+    Python < PostgreSQL (BB): : Confirm β appended
+    Python > Voter: β is appended successfully
+    loop [label: for each null ballot] {
+        PostgreSQL (BB) > Python: Encrypt null vote
+        Python > PostgreSQL (BB): Encrypted null vote e_0
+        PostgreSQL (BB) > Python: Generate null proof π_id
+        Python:  > PostgreSQL(BB): Proof πid for null ballot
+        PostgreSQL (BB) > PostgreSQL (BB): Append null ballot
+    }
+}
+else [label: if invalid] {
+    PostgreSQL (BB) > Voter: Invalid ballot notification
+}
+deactivate PostgreSQL (BB)
+

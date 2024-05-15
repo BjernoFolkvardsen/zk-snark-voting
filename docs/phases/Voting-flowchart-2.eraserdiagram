@@ -1,0 +1,47 @@
+flowchart-diagram
+
+// Define nodes and relationships "A > B"
+
+// Set shape and icon properties in "[]"
+cr_id [shape: oval, icon: data], t_id [shape: oval, icon: data, ] > sk_id
+id [shape: oval, icon: user, ], sk_id [shape: oval, icon: data, ], pk_T [shape: oval, icon: key,  ], v [shape: oval, icon: user-check,  ] > Vote()
+Voter[shape: document, icon: user, color: darkgrey] > Vote(): runs 
+Vote() [ icon: function,  color: grey] > Computes e_v = enc_pk_T(v;r) [icon: function,  color: grey]
+Encryption randomeness r[shape: oval, icon: random,  ] > Computes e_v = enc_pk_T(v;r)
+Computes e_v = enc_pk_T(v;r) > e_v [shape: oval, icon: envelope,  ]
+
+Vote() --> Nullifying previous vote [icon: function,  color: grey]
+Nullifying previous vote --> v=v_new-v_pre [shape: oval, icon: user-check,  ]
+Encryption randomeness r > g^r [shape: oval, icon: data,  ], pk_T^r [shape: oval, icon: data,  ]
+v=v_new-v_pre --> Computes e_v = enc_pk_T(v;r)
+e_v > Compute zk-SNARK-proof [icon: function,  color: grey]
+
+Encryption randomeness r > Compute zk-SNARK-proof
+
+c_id [shape: oval, icon: data,  ] > Compute zk-SNARK-proof
+v > Compute zk-SNARK-proof 
+t_id > Compute zk-SNARK-proof 
+g^v[shape: oval, icon: data,  ] > Compute zk-SNARK-proof 
+rt_L [shape: oval, icon: data,  ]> Compute zk-SNARK-proof 
+g^0 [shape: oval, icon: data,  ] > Compute zk-SNARK-proof 
+g^r > Compute zk-SNARK-proof
+pk_T^r > Compute zk-SNARK-proof
+cr_id, t_id > H(cr_id;t_id) [shape: oval, icon: data,  ]
+Compute zk-SNARK-proof > πid =((r;cid;v;tid)|(ev =(gr;gvpkTr )∧cid =H(crid;tid)∧cid ∈rtL))∨((r;g0)|e0 =(gr;g0pkTr )) [shape: oval, icon: data,  ]
+
+
+πid =((r;cid;v;tid)|(ev =(gr;gvpkTr )∧cid =H(crid;tid)∧cid ∈rtL))∨((r;g0)|e0 =(gr;g0pkTr )) > Submits ß
+e_v > Submits ß [color: grey, icon: function]
+cr_id > Submits ß
+Submits ß > Bulletin Board [shape: cylinder, icon: database, color: black]: Anonymous channel
+Bulletin Board > Valid(ß) [icon: function,  color: grey]
+Valid(ß) > Check validity of proof [icon: activity,  color: grey] > Verifies ballot does not exist on BB [icon: activity,  color: grey]
+Verifies ballot does not exist on BB > Append(BB; ß)
+Append(BB; ß) [icon: function,  color: grey] > Bulletin Board
+Voter > Verifies vote is on BB [icon: function,  color: grey]
+
+
+Generates null ballots [icon: repeat,  color: grey] {
+	 Bulletin Board, Computes e_0 = enc_pkt(0;random) , selects a cr_id from a ß on BB, Compute null-ballot zk-SNARK-proof
+}
+
