@@ -1,11 +1,15 @@
 flowchart-diagram
 
 // Define Phases
-Setup {
+Setup [color: darkgrey] {
 	 Circuit, CircomCompiler, R1cs, Wasm, Sym, Generate_witness.js, PtauCeremony, PtauFiles, Entropy, ContributePhase2, ZkSetup, Zkey(pkey), ExportVkey, Vkey
 }
-Voting {
-	 input.json, GenWitness, Witness.wtns, ZkProve, proof.json, public.json, Verify
+Voting [color: black] {
+	 input.json, GenWitness, Witness.wtns, ZkProve, proof.json, public.json, ExportVkey, Vkey
+}
+
+Tally [color: grey] {
+  Verify
 }
 // Define flow
 Circuit [icon: code] > CircomCompiler [icon: settings]
@@ -26,12 +30,11 @@ Entropy [icon: file-text] > ContributePhase2
 ContributePhase2 > Zkey(pkey) : updates key
 Witness.wtns > ZkProve [icon: eye-off]
 Zkey(pkey) > ZkProve
+ZkProve > ExportVkey [icon: function]
+ExportVkey > Vkey [icon: key]
 ZkProve > proof.json [icon: data]
 ZkProve > public.json [icon: data]
-Zkey(pkey) > ExportVkey[icon: function]
-ExportVkey > Vkey [icon: key]
-Vkey > Verify [icon: check]
+Vkey > Verify
 public.json > Verify
 proof.json > Verify
-
 
