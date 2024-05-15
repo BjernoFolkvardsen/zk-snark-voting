@@ -19,4 +19,3 @@ else [label: if PET is not passed] {
 Python > PostgreSQL (BB): Publish decrypted ballots and proof of correct shuffle and decryption
 Tallier < Python: Tally done
 deactivate Tallier
-
