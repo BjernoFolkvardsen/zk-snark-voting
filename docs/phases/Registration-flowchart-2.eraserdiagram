@@ -21,3 +21,6 @@ rt_L > ComputeSignature(L; rt_L; sk_σ)
 Registrar > sk_σ[shape: oval, icon: key, ] > ComputeSignature(L; rt_L; sk_σ)
 ComputeSignature(L; rt_L; sk_σ) > (L; rt_L; σ)[shape: oval, icon: data, ]
 (L; rt_L; σ) > Bulletin Board
+Voter > Verify(c_id; L; rt_L ) [icon: function, color: grey]
+Verify(c_id; L; rt_L ) > Bulletin Board
+
