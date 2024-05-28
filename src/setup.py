@@ -48,7 +48,6 @@ class SetupManager:
             raise Exception("Too many voters for the zk-SNARK proof. The maximum number of voters is 2^30.")
         working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/FullCircuit/"
         ptau = PTau(ptau_file=working_dir+"../ptau_13.ptau")
-        # Create the circuit from the template with the correct depth of the merkle tree
         with open(working_dir+"circuit.txt") as f:
             with open(working_dir+"circuit.circom", "w") as f1:
                 for line in f:
@@ -57,8 +56,6 @@ class SetupManager:
         
         circuit = Circuit("circuit.circom", working_dir=working_dir,output_dir=working_dir)
         circuit.compile()
-        # circuit.get_info()
-        # circuit.print_constraints()
         circuit.setup(GROTH, ptau)
         circuit.contribute_phase2(entropy="p1", output_file=working_dir+"final.zkey")
         circuit.export_vkey(output_file=working_dir+"../../tmp/vkey.json")

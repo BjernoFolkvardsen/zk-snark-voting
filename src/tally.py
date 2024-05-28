@@ -4,6 +4,8 @@ from zkpy.circuit import Circuit, GROTH
 import random
 import json
 import os
+import time
+import csv
 
 class Tally:
     bb: BullitinBoard = None
@@ -25,7 +27,10 @@ class Tally:
         self.calculate_results(final_ballots)
 
     def verify_ballot_votes(self, ballot):
+    # ProofVerification tests: outcomment the lines in this function to run the test
+        # benchmark_data = []
         for candidate_id in ballot:
+            # start_time = time.time()
             working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../tmp/"
             circuit = Circuit("circuit.circom", working_dir=working_dir,output_dir=working_dir)
             # with open("tmp/vkey.json", "w") as file:
@@ -37,6 +42,13 @@ class Tally:
 
             if False == circuit.verify(GROTH, vkey_file=working_dir+"vkey.json", public_file=working_dir+"public.json", proof_file=working_dir+"proof.json"):
                 return False
+            # stop_time = time.time()
+            # benchmark_data.append({"time": stop_time - start_time})
+
+        # with open('proof_verification_individual.csv', 'w', newline='') as file:
+        #      writer = csv.DictWriter(file, fieldnames=["time"])
+        #      writer.writeheader()
+        #      writer.writerows(benchmark_data)
         return True
 
     def add_vote_same_pseudonym(self, cr_id):
@@ -58,13 +70,6 @@ class Tally:
                     for j in range(len(final_ballot)):
                         c1,c2 = elGamal.homomorphic_addition((int(final_ballot[j.__str__()][0]),int(final_ballot[j.__str__()][1])), (int(ballots[i]["data"][j.__str__()]["vote"][0]), int(ballots[i]["data"][j.__str__()]["vote"][1])))
                         final_ballot[j.__str__()] = (str(c1), str(c2))
-
-        ## for test only
-        # final_ballot_decrypted = {}
-        # for j in range(len(final_ballot)):
-        #     final_ballot_decrypted[j.__str__()] = str(elGamal.decrypt(int(final_ballot[j.__str__()][0]), int(final_ballot[j.__str__()][1])))
-        # self.bb.set_final_ballots_decrypted(final_ballot_decrypted, cr_id)
-        ## end test
 
         self.bb.set_final_ballots(final_ballot)
 

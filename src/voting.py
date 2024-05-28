@@ -6,6 +6,8 @@ from src.merkly import MerklyTree
 import random
 import os
 import json
+import time
+import csv
 class Voting:
     bb: BullitinBoard = None
 
@@ -13,6 +15,9 @@ class Voting:
         self.bb = bb
 
     def voting(self):
+    # BallotGeneration tests: outcomment the lines in this function to run the test
+        # benchmark_data = []
+
         voters = self.bb.get_voters()
         votes_made = self.bb.get_votes()
         elgamal = self.bb.get_elgamal()
@@ -22,7 +27,11 @@ class Voting:
         for voter in voters:
             for vote in votes_made:
                 if voter["id"] == vote["voterId"] :
+                    # start_time = time.time()
                     self.vote(voter["id"], voter["t_id"], voter["cr_id"], public_key, vote["vote"], prime, group)
+                    # stop_time = time.time()
+                    # benchmark_data.append({"time": stop_time - start_time})
+
                     self.verify_vote_on_bb(voter["cr_id"])
 
                     if "re-vote" in vote:
@@ -31,11 +40,25 @@ class Voting:
                     if "null-vote" in vote:
                         self.null_votes(prime, group, public_key)
 
+        # with open('ballot_generation_sec_.csv', 'w', newline='') as file:
+        #     writer = csv.DictWriter(file, fieldnames=["time"])
+        #     writer.writeheader()
+        #     writer.writerows(benchmark_data)
+
 
     def vote(self, id, t_id, cr_id, pk_T, v_id, p, g):
+    # MerkleTreeTraversel tests: outcomment the lines with MTT in this function to run the test
+    # ProofGenerationTime tests: outcomment the lines with PGT in this function to run the test
+        # (MTT) (PGT)
+        # benchmark_data = []
         elGamal = Utility.constructElGamal((p, g, pk_T))
         ballot = self.bb.get_empty_ballot()
+        # (MTT)
+        # start_timeMT = time.time()
         c_id, path_indices, siblings = self.get_c_id_and_tree_proof(id)
+        # (MTT)
+        # stop_timeMT = time.time()
+        # benchmark_data.append({"time": stop_timeMT - start_timeMT})
         for candidate, empty_value in ballot.items():
             if candidate == v_id:
                 vote = 1
@@ -44,13 +67,29 @@ class Voting:
             c1,c2,r = elGamal.encrypt(vote)
             e_v = [str(c1),str(c2)]
             ballot[candidate]["vote"] = e_v
+            # (PGT)
+            # start_timeMT = time.time()
             ballot[candidate]["zk_proof"] = self.zk_snark(c_id, vote, cr_id, t_id, e_v, r, g, pk_T, path_indices, siblings)
-            
+            # (PGT)
+            # stop_timeMT = time.time()
+            # benchmark_data.append({"time": stop_timeMT - start_timeMT})
+
         ballot_exist = self.bb.does_ballot_already_exist(cr_id=cr_id, cand_id=str(v_id), e_v=e_v)
         if ballot_exist:
             print(f"Vote already made.")
         else:
             self.bb.set_ballot(ballot, cr_id)
+        # (MTT)
+        # with open('get_path_indices_and_siblings.csv', 'w', newline='') as file:
+        #    writer = csv.DictWriter(file, fieldnames=["time"])
+        #    writer.writeheader()
+        #    writer.writerows(benchmark_data)
+        
+        # (PGT)
+        # with open('proof_generation_time.csv', 'w', newline='') as file:
+        #    writer = csv.DictWriter(file, fieldnames=["time"])
+        #    writer.writeheader()
+        #    writer.writerows(benchmark_data)
 
     
     def change_vote(self, id, t_id, cr_id, pk_T, v_new, p, g, v_pre):
