@@ -80,7 +80,13 @@ make start-db
 make clearAndRun
 ```
 ## Test
-...
+For testing, clone the benchmarking branch. This branch contains existing data for already run tests and the code to reproduce the tests. 
+The tests are visible in files app.py, voting.py, and tally.py, each file containing the necessary commands to run the different tests. Simply uncomment the specified lines and run the protocol as specified in the _Usage_ section above. 
+
+For all tests, you must specify the number of voters and candidates to run the protocol with; this is done in app.py. If you wish to test the functions of re-votes and null-votes, these numbers must equally be specified in the app.py file. 
+
+Tests concerning ballot generation, proof generation, and Merkle tree traversal are done in the voting.py file, and the test concerning proof verification is in tally.py.
+
 ## Issues
 If you encounter any issues or have suggestions, please open an issue [here](https://github.com/BjernoFolkvardsenDev/zk-snark-voting/issues).
 
