@@ -211,9 +211,8 @@ class ElGamal():
         b2 = Integer(b2)
         (c1, c2) = (a1* (pow(b1,(self.p-2), self.p)) % self.p), (a2 * (pow(b2,(self.p-2), self.p)) % self.p) 
         # Math is from this paper: https://medium.com/@VitalikButerin/exploring-elliptic-curve-pairings-c73c1864e627
-        # curve point division
-        z = Integer.random_range(min_inclusive=2, max_exclusive=self.p-2, randfunc=self.randfunc)  # Generate a random exponent z
-        (c1, c2) = (pow(c1, z, self.p), pow(c2, z, self.p))  # Blind the ciphertext
+        z = Integer.random_range(min_inclusive=2, max_exclusive=self.p-2, randfunc=self.randfunc)
+        (c1, c2) = (pow(c1, z, self.p), pow(c2, z, self.p)) 
         return (int(c2) * pow(int(c1), -1*int(self.x), int(self.p))) % int(self.p) == 1
 
     def make_proof_of_decryption():

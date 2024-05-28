@@ -1,5 +1,4 @@
 from src.bulletinboard import BullitinBoard
-from src.registration import VoterRegistration
 from src.utility import Utility
 from zkpy.circuit import Circuit, GROTH
 from src.merkly import MerklyTree
@@ -84,7 +83,7 @@ class Voting:
         #    writer = csv.DictWriter(file, fieldnames=["time"])
         #    writer.writeheader()
         #    writer.writerows(benchmark_data)
-        
+
         # (PGT)
         # with open('proof_generation_time.csv', 'w', newline='') as file:
         #    writer = csv.DictWriter(file, fieldnames=["time"])
@@ -166,11 +165,7 @@ class Voting:
 
         circuit.gen_witness(working_dir+"input.json")
         circuit.prove(GROTH)
-        # circuit.export_vkey(output_file=working_dir+"vkey.json")
-
         proof_data = {"vkey":{}, "public": {}, "proof": {}}
-        # with open("circuits/FullCircuit/vkey.json", "r") as file:
-        #     proof_data["vkey"] = json.load(file)
         with open("circuits/FullCircuit/public.json", "r") as file:
             proof_data["public"] = json.load(file)
         with open("circuits/FullCircuit/proof.json", "r") as file:
