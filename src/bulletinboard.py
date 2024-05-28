@@ -30,7 +30,7 @@ class BullitinBoard:
                 self.db_type = "local_file"
                 self.path = "src/Data/data.json"
 
-    def generate_data(self, num_voters=4, num_candidates=2):
+    def generate_data(self, num_voters=4, num_candidates=2, re_vote_percent=1, null_vote_percent=1):
         fake = Faker()
 
         eligible_voters = [{"id": str(i), "name": fake.first_name()} for i in range(num_voters)]
@@ -42,7 +42,7 @@ class BullitinBoard:
             vote = {"voterId": str(i), "vote": random.choice(candidates)["id"]}
             votes.append(vote)
 
-        num_re_votes = random.randint(1, num_voters//2)
+        num_re_votes = round(num_voters * re_vote_percent)
 
         for i in range(num_re_votes):
             re_vote_candidate = random.choice(candidates)["id"]
@@ -50,6 +50,11 @@ class BullitinBoard:
                 re_vote_candidate = random.choice(candidates)["id"]
             re_vote = {"voterId": str(i), "re-vote": re_vote_candidate}
             votes[i].update(re_vote)
+        
+        num_null_votes = round(num_voters * null_vote_percent)
+        for i in range(num_null_votes):
+            null_vote = {"voterId": str(i), "null-vote": 1}
+            votes[i].update(null_vote)
 
         self.set_data(eligible_voters, collection_name="eligible_voters", many=True)
         self.set_data(candidates, collection_name="candidates", many=True)
@@ -218,6 +223,10 @@ class BullitinBoard:
 
     def get_ballot_by_cr_id(self, cr_id:str):
         return self.get_data(collection_name="ballots", query = {"key": cr_id}, many=True)
+    
+    def does_ballot_already_exist(self, cr_id:str, cand_id:str, e_v:tuple[str,str]):
+        result = self.get_data(collection_name="ballots", query = {"key": cr_id, "data."+cand_id+".vote.1":e_v[1]}, many=True)
+        return len(result) != 0
 
     ## Final ballots
     def set_final_ballots(self,final_ballot):

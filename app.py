@@ -6,53 +6,71 @@ from src.tally import Tally
 from src.verification import Verification
 import pymongo
 import time
+import csv
+
+def run_election(num_voters,num_candidates,benchmark,re_vote_percent=0,null_vote_percent=0):
+    benchmark_data = {"num_voters": num_voters, "num_candidates": num_candidates, "start_time": 0, "setup_time": 0, "registration_time": 0, "voting_time": 0, "tally_time": 0, "end_time": 0, "setup_time_taken_sec": 0, "setup_time_taken_min": 0, "registration_time_taken_sec": 0, "registration_time_taken_min": 0, "voting_time_taken_sec": 0, "voting_time_taken_min": 0, "tally_time_taken_sec": 0, "tally_time_taken_min": 0, "total_time_taken_sec": 0, "total_time_taken_min": 0}
+    db_name = "db_"+str(num_voters)+"_"+str(num_candidates)
+    # Clear DB before running
+    client = pymongo.MongoClient("mongodb://localhost:27017/")
+    client.drop_database(db_name)
+
+    bb = BullitinBoard(env="local", args={"type": "mongo_db", "db_name": db_name})
+    bb.generate_data(num_voters=num_voters, num_candidates=num_candidates, re_vote_percent=re_vote_percent, null_vote_percent=null_vote_percent)
+
+    start_time = time.time()
+    ## Normal Protocol Flow
+    setup_manager = SetupManager(bb)
+    setup_time = time.time()
+    registration_manager = VoterRegistration(bb)
+    registration_manager.registration()
+    registration_time = time.time()
+    voting_manager = Voting(bb)
+    voting_manager.voting()
+    voting_time = time.time()
+    tally_manager = Tally(bb)
+    tally_manager.tally()
+    tally_time = time.time()
+    # verfication_manager = Verification(bb)
+    # verfication_manager.verify_tally()
+
+    end_time = time.time()
+    benchmark_data["start_time"] = start_time
+    benchmark_data["setup_time"] = setup_time
+    benchmark_data["registration_time"] = registration_time
+    benchmark_data["voting_time"] = voting_time
+    benchmark_data["tally_time"] = tally_time
+    benchmark_data["end_time"] = end_time
+    benchmark_data["setup_time_taken_sec"] = setup_time - start_time
+    benchmark_data["setup_time_taken_min"] = (setup_time - start_time)/60
+    benchmark_data["registration_time_taken_sec"] = registration_time - setup_time
+    benchmark_data["registration_time_taken_min"] = (registration_time - setup_time)/60
+    benchmark_data["voting_time_taken_sec"] = voting_time - registration_time
+    benchmark_data["voting_time_taken_min"] = (voting_time - registration_time)/60
+    benchmark_data["tally_time_taken_sec"] = tally_time - voting_time
+    benchmark_data["tally_time_taken_min"] = (tally_time - voting_time)/60
+    benchmark_data["total_time_taken_sec"] = end_time - start_time
+    benchmark_data["total_time_taken_min"] = (end_time - start_time)/60
+    benchmark.append(benchmark_data)
+    return benchmark
 
 if __name__ == "__main__":
+    keys_list = ["num_voters", "num_candidates", "start_time", "setup_time", "registration_time", "voting_time", "tally_time", "end_time", "setup_time_taken_sec", "setup_time_taken_min", "registration_time_taken_sec", "registration_time_taken_min", "voting_time_taken_sec", "voting_time_taken_min", "tally_time_taken_sec", "tally_time_taken_min", "total_time_taken_sec", "total_time_taken_min"]
 
-    benchmark = []
-    for num_voters in [5]: # 50, 100, 500, 1000, 5000, 10000, 50000, 100000]:
-        for num_candidates in [3]:
-            benchmark_data = {"num_voters": num_voters, "num_candidates": num_candidates, "start_time": 0, "end_time": 0, "time_taken_sec": 0, "time_taken_min": 0}
-            db_name = "db_"+str(num_voters)+"_"+str(num_candidates)
-            # Clear DB before running
-            client = pymongo.MongoClient("mongodb://localhost:27017/")
-            client.drop_database(db_name)
+    # null_vote_percent = 0
+    # for revote_percent in [0]:
+    revote_percent = 0
+    for null_vote_percent in [0]:
+        benchmark = []
+        for num_voters in [5,10,25,50,75,100]:
+            for num_candidates in [10]:
+                benchmark = run_election(num_voters, num_candidates, benchmark, re_vote_percent=revote_percent, null_vote_percent=null_vote_percent)
+                with open( str(num_voters)+'_'+str(num_candidates)+'_benchmark_'+str(revote_percent)+'_revote_and_'+str(null_vote_percent)+'_nullvote.csv', 'w', newline='') as file:
+                    writer = csv.DictWriter(file, fieldnames = keys_list)
+                    writer.writeheader()
+                    writer.writerows(benchmark)
 
-            bb = BullitinBoard(env="local", args={"type": "mongo_db", "db_name": db_name})
-
-            start_time = time.time()
-            ## Normal Protocol Flow
-            setup_manager = SetupManager(bb, dummy_data={"num_voters": num_voters, "num_candidates": num_candidates})
-            registration_manager = VoterRegistration(bb)
-            registration_manager.registration()
-            voting_manager = Voting(bb)
-            voting_manager.voting()
-            tally_manager = Tally(bb)
-            tally_manager.tally()
-            verfication_manager = Verification(bb)
-            verfication_manager.verify_tally()
-
-            end_time = time.time()
-            benchmark_data["start_time"] = start_time
-            benchmark_data["end_time"] = end_time
-            benchmark_data["time_taken_sec"] = end_time - start_time
-            benchmark_data["time_taken_min"] = (end_time - start_time)/60
-            benchmark.append(benchmark_data)
-    print(benchmark)
-
-    ## ZK-SNARK testing flow
-    # setup_manager = SetupManager()
-    # setup_manager.setup_zk_SNARK()
-    # voting_manager = Voting()
-    # voting_manager.zk_snark()
-
-    ## Test MongoDB
-    # client = pymongo.MongoClient("mongodb://localhost:27017/")
-    # db = client["database"]
-    # collection = db["public_params"]
-    # mydict = { "name": "John", "address": "Highway 37" }
-    # x = collection.insert_one(mydict)
-
-    # y = collection.find_one()
-
-    # print(y)
+        with open('final_benchmark_'+str(revote_percent)+'_revote_and_'+str(null_vote_percent)+'_nullvote.csv', 'w', newline='') as file:
+            writer = csv.DictWriter(file, fieldnames = keys_list)
+            writer.writeheader()
+            writer.writerows(benchmark)

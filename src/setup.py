@@ -11,10 +11,8 @@ class SetupManager:
 
     bb: BullitinBoard = None
 
-    def __init__(self, bb: BullitinBoard, dummy_data=False):
+    def __init__(self, bb: BullitinBoard):
         self.bb = bb
-        if dummy_data:
-            self.bb.generate_data(num_voters=dummy_data["num_voters"], num_candidates=dummy_data["num_candidates"])
         self.setup()
     
     def setup(self):
@@ -63,4 +61,5 @@ class SetupManager:
         # circuit.print_constraints()
         circuit.setup(GROTH, ptau)
         circuit.contribute_phase2(entropy="p1", output_file=working_dir+"final.zkey")
+        circuit.export_vkey(output_file=working_dir+"../../tmp/vkey.json")
         self.bb.set_zkey_file_name(circuit.zkey_file)

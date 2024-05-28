@@ -1,10 +1,7 @@
-from Crypto.Random.random import getrandbits
 from Crypto.Random import get_random_bytes
 from Crypto.Math.Numbers import Integer
-from Crypto.Util.number import inverse
 from Crypto.Math.Primality import ( test_probable_prime, COMPOSITE )
 from pyseidon.posiedon import Poseidon
-import random
 import math
 
 class CouldNotDecrypt(Exception):
@@ -19,9 +16,8 @@ class Utility :
 
     @staticmethod
     def commit(m):
-        random = getrandbits(253) # OBS choose random length another way than "its shorter than the prime"
+        random = Integer.random_range(min_inclusive=2, max_exclusive=Utility.GLOBAL_FIELD_P-1, randfunc=get_random_bytes)
         commitment = Poseidon().hash([int(m),random])
-        # Found commit within prime field GLOBAL_FIELD_P
         return (hex(commitment),random)
 
     @staticmethod

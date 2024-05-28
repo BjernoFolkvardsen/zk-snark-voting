@@ -20,21 +20,22 @@ class Voting:
         group = int(elgamal["group"])
         public_key = int(elgamal["public_key"])
         for voter in voters:
-            for i in range(0, random.randint(1, 2)):
-                    self.null_votes(prime,group, public_key)
             for vote in votes_made:
                 if voter["id"] == vote["voterId"] :
                     self.vote(voter["id"], voter["t_id"], voter["cr_id"], public_key, vote["vote"], prime, group)
                     self.verify_vote_on_bb(voter["cr_id"])
-                    
+
                     if "re-vote" in vote:
                         self.change_vote(voter["id"], voter["t_id"], voter["cr_id"], public_key, vote["re-vote"], prime, group, vote["vote"])
-                        break
+
+                    if "null-vote" in vote:
+                        self.null_votes(prime, group, public_key)
 
 
     def vote(self, id, t_id, cr_id, pk_T, v_id, p, g):
         elGamal = Utility.constructElGamal((p, g, pk_T))
         ballot = self.bb.get_empty_ballot()
+        c_id, path_indices, siblings = self.get_c_id_and_tree_proof(id)
         for candidate, empty_value in ballot.items():
             if candidate == v_id:
                 vote = 1
@@ -43,13 +44,19 @@ class Voting:
             c1,c2,r = elGamal.encrypt(vote)
             e_v = [str(c1),str(c2)]
             ballot[candidate]["vote"] = e_v
-            ballot[candidate]["zk_proof"] = self.zk_snark(id, vote, cr_id, t_id, e_v, r, g, pk_T)
+            ballot[candidate]["zk_proof"] = self.zk_snark(c_id, vote, cr_id, t_id, e_v, r, g, pk_T, path_indices, siblings)
             
-        self.bb.set_ballot(ballot, cr_id)
+        ballot_exist = self.bb.does_ballot_already_exist(cr_id=cr_id, cand_id=str(v_id), e_v=e_v)
+        if ballot_exist:
+            print(f"Vote already made.")
+        else:
+            self.bb.set_ballot(ballot, cr_id)
+
     
     def change_vote(self, id, t_id, cr_id, pk_T, v_new, p, g, v_pre):
         elGamal = Utility.constructElGamal((p, g, pk_T))
         ballot = self.bb.get_empty_ballot()
+        c_id, path_indices, siblings = self.get_c_id_and_tree_proof(id)
         for candidate, empty_value in ballot.items():
             r = random.randint(1, p-2)
             if candidate == v_new:
@@ -61,9 +68,13 @@ class Voting:
             (c1,c2,r) = elGamal.encrypt(vote)
             e_v = [str(c1),str(c2)]
             ballot[candidate]["vote"] = e_v
-            ballot[candidate]["zk_proof"] = self.zk_snark(id, vote, cr_id, t_id, e_v, r, g, pk_T)
+            ballot[candidate]["zk_proof"] = self.zk_snark(c_id, vote, cr_id, t_id, e_v, r, g, pk_T, path_indices, siblings)
 
-        self.bb.set_ballot(ballot, cr_id)
+        ballot_exist = self.bb.does_ballot_already_exist(cr_id=cr_id, cand_id=str(v_new), e_v=e_v)
+        if ballot_exist:
+            print(f"Vote already made.")
+        else:
+            self.bb.set_ballot(ballot, cr_id)
     
     def null_votes(self, p, g, pk_T):
         random.seed()
@@ -74,19 +85,20 @@ class Voting:
             cr_ids.append(voter["cr_id"])
         selected_cr_id = random.choice(cr_ids)
 
-        
         ballot = self.bb.get_empty_ballot()
         elGamal = Utility.constructElGamal((p, g, pk_T))
+        c_id, path_indices, siblings = self.get_c_id_and_tree_proof()
         for candidate, empty_value in ballot.items():
             r = random.randint(1, p-2)
             c1,c2,r = elGamal.encrypt(0)
             e_v = [str(c1),str(c2)]
             ballot[candidate]["vote"] = e_v
-            ballot[candidate]["zk_proof"] = self.zk_snark(0, 0, selected_cr_id, 0, e_v, r, g, pk_T)
+            ballot[candidate]["zk_proof"] = self.zk_snark(c_id, 0, selected_cr_id, 0, e_v, r, g, pk_T, path_indices, siblings)
+
         self.bb.set_ballot(ballot, selected_cr_id)
 
 
-    def zk_snark(self, id, v, cr_id, t_id, encrypt_vote, r, g, pk_T):
+    def zk_snark(self, c_id, v, cr_id, t_id, encrypt_vote, r, g, pk_T, path_indices, siblings):
         zkey_file_name = self.bb.get_zkey_file_name()
         working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../circuits/FullCircuit/"
         js_dir = working_dir+"circuit_js/"
@@ -95,19 +107,6 @@ class Voting:
         witness=working_dir+"witness.wtns",
         zkey= zkey_file_name,
         vkey= working_dir+"vkey.json")
-        
-        list_L = self.bb.get_list_id_commitment()
-        if(id!=0):
-            for tuple in list_L:
-                if tuple[0] == id:
-                    c_id = tuple[1]
-                    break
-            tree = MerklyTree(list(map(lambda x: int(x[1]), list_L)))
-            (path_indices, siblings) = self.get_path_indices_and_siblings(tree,int(c_id))
-        else:
-            tuple = random.choice(list_L)
-            (path_indices, siblings) = self.get_path_indices_and_siblings(MerklyTree(list(map(lambda x: int(x[1]), list_L))),int(tuple[1]))
-            c_id = 0
 
         inputs = {
                     "pk_t":str(pk_T),
@@ -128,18 +127,32 @@ class Voting:
 
         circuit.gen_witness(working_dir+"input.json")
         circuit.prove(GROTH)
-        circuit.export_vkey(output_file=working_dir+"vkey.json")
+        # circuit.export_vkey(output_file=working_dir+"vkey.json")
 
         proof_data = {"vkey":{}, "public": {}, "proof": {}}
-        with open("circuits/FullCircuit/vkey.json", "r") as file:
-            proof_data["vkey"] = json.load(file)
+        # with open("circuits/FullCircuit/vkey.json", "r") as file:
+        #     proof_data["vkey"] = json.load(file)
         with open("circuits/FullCircuit/public.json", "r") as file:
             proof_data["public"] = json.load(file)
         with open("circuits/FullCircuit/proof.json", "r") as file:
             proof_data["proof"] = json.load(file)
         
         return proof_data
-        # circuit.verify(GROTH, vkey_file=working_dir+"vkey.json", public_file=working_dir+"public.json", proof_file=working_dir+"proof.json")
+
+    def get_c_id_and_tree_proof(self, id=0):
+        list_L = self.bb.get_list_id_commitment()
+        if(id!=0):
+            for tuple in list_L:
+                if tuple[0] == id:
+                    c_id = tuple[1]
+                    break
+            tree = MerklyTree(list(map(lambda x: int(x[1]), list_L)))
+            (path_indices, siblings) = self.get_path_indices_and_siblings(tree,int(c_id))
+        else:
+            tuple = random.choice(list_L)
+            (path_indices, siblings) = self.get_path_indices_and_siblings(MerklyTree(list(map(lambda x: int(x[1]), list_L))),int(tuple[1]))
+            c_id = 0
+        return (c_id, path_indices, siblings)
     
     def get_path_indices_and_siblings(self, tree, leaf_value):
         path_indices = []

@@ -17,9 +17,9 @@ class VoterRegistration:
         eligible_voters = self.bb.get_eligible_voters()
 
         for eligible_voter in eligible_voters:
-            if random.randint(0,4) == 0:
+            # if random.randint(0,4) == 0:
                 # print("Voter didn't register: ", eligible_voter)
-                continue
+                # continue
             (c_id, cr_id, t_id) = self.register_voter(eligible_voter["id"], eligible_voter["name"])
             self.register(eligible_voter["id"],c_id)
 

@@ -28,8 +28,8 @@ class Tally:
         for candidate_id in ballot:
             working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../tmp/"
             circuit = Circuit("circuit.circom", working_dir=working_dir,output_dir=working_dir)
-            with open("tmp/vkey.json", "w") as file:
-                json.dump(ballot[candidate_id]["zk_proof"]["vkey"], file)
+            # with open("tmp/vkey.json", "w") as file:
+            #     json.dump(ballot[candidate_id]["zk_proof"]["vkey"], file)
             with open("tmp/public.json", "w") as file:
                 json.dump(ballot[candidate_id]["zk_proof"]["public"], file)
             with open("tmp/proof.json", "w") as file:
@@ -60,11 +60,11 @@ class Tally:
                         final_ballot[j.__str__()] = (str(c1), str(c2))
 
         ## for test only
-        final_ballot_decrypted = {}
-        for j in range(len(final_ballot)):
-            final_ballot_decrypted[j.__str__()] = str(elGamal.decrypt(int(final_ballot[j.__str__()][0]), int(final_ballot[j.__str__()][1])))
-        self.bb.set_final_ballots_decrypted(final_ballot_decrypted, cr_id)
-        ##***************
+        # final_ballot_decrypted = {}
+        # for j in range(len(final_ballot)):
+        #     final_ballot_decrypted[j.__str__()] = str(elGamal.decrypt(int(final_ballot[j.__str__()][0]), int(final_ballot[j.__str__()][1])))
+        # self.bb.set_final_ballots_decrypted(final_ballot_decrypted, cr_id)
+        ## end test
 
         self.bb.set_final_ballots(final_ballot)
 
@@ -76,8 +76,6 @@ class Tally:
         elgamal_priv_key = self.bb.get_private_param("elgamal_priv_key")
         elGamal = Utility.constructElGamal((int(elgamal["prime"]), int(elgamal["group"]), int(elgamal["public_key"]), int(elgamal_priv_key)))
         final_valid_ballots = []
-        # print("final_ballots: ", final_ballots)
-        # print()
         for ballot in final_ballots:
             votes_valid = False
             for candidate_id, candidate_data in ballot.items():
@@ -100,7 +98,6 @@ class Tally:
         elgamal = self.bb.get_elgamal()
         elgamal_priv_key = self.bb.get_private_param("elgamal_priv_key")
         elGamal = Utility.constructElGamal((int(elgamal["prime"]), int(elgamal["group"]), int(elgamal["public_key"]), int(elgamal_priv_key)))
-        # print("valid_ballots: ", valid_ballots)
         candidates = self.bb.get_candidates()
         results = {str(candidate["id"]): 0 for candidate in candidates}
         id_to_name = {str(candidate["id"]): candidate["candidate"] for candidate in candidates}
@@ -113,8 +110,6 @@ class Tally:
             else:
                 for candidate_id, candidate_data in ballot.items():
                     results_ballot[candidate_id] = elGamal.homomorphic_addition((int(results_ballot[candidate_id][0]), int(results_ballot[candidate_id][1])), (int(candidate_data[0]), int(candidate_data[1])))
-        
-        # print("results_ballot: ", results_ballot)
 
         results_ballot_decrypted = {}
         results = {}
@@ -123,7 +118,6 @@ class Tally:
             results[candidate_id] = decrypted_votes_count
             results_ballot_decrypted[candidate_id] = {}
             results_ballot_decrypted[candidate_id]['number_of_votes'] = str(decrypted_votes_count)
-        # print("results_ballot_decrypted: ", results_ballot_decrypted)
 
         results_with_names = {id_to_name[id]: result['number_of_votes'] for id, result in results_ballot_decrypted.items()}
 

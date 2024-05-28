@@ -7,4 +7,6 @@ shamirs==2.1.0
 merkly==1.0.2
 zkpy==0.2.0
 parameterized==0.9.0
+prettytable==3.10.0
+faker==24.7.1
 pymongo==4.6.3
