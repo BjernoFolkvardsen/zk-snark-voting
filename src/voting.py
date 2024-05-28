@@ -1,5 +1,4 @@
 from src.bulletinboard import BullitinBoard
-from src.registration import VoterRegistration
 from src.utility import Utility
 from zkpy.circuit import Circuit, GROTH
 from src.merkly import MerklyTree
@@ -13,9 +12,10 @@ class Voting:
         self.bb = bb
 
     def voting(self):
+        # Runs a simulated election voting process
         voters = self.bb.get_voters()
         votes_made = self.bb.get_votes()
-        elgamal = self.bb.get_elgamal()
+        elgamal = self.bb.get_public_params("elgamal")
         prime = int(elgamal["prime"])
         group = int(elgamal["group"])
         public_key = int(elgamal["public_key"])
@@ -45,14 +45,14 @@ class Voting:
             e_v = [str(c1),str(c2)]
             ballot[candidate]["vote"] = e_v
             ballot[candidate]["zk_proof"] = self.zk_snark(c_id, vote, cr_id, t_id, e_v, r, g, pk_T, path_indices, siblings)
-            
+
         ballot_exist = self.bb.does_ballot_already_exist(cr_id=cr_id, cand_id=str(v_id), e_v=e_v)
         if ballot_exist:
             print(f"Vote already made.")
         else:
             self.bb.set_ballot(ballot, cr_id)
 
-    
+
     def change_vote(self, id, t_id, cr_id, pk_T, v_new, p, g, v_pre):
         elGamal = Utility.constructElGamal((p, g, pk_T))
         ballot = self.bb.get_empty_ballot()
@@ -75,14 +75,11 @@ class Voting:
             print(f"Vote already made.")
         else:
             self.bb.set_ballot(ballot, cr_id)
-    
+
     def null_votes(self, p, g, pk_T):
         random.seed()
-        cr_ids = []
 
-        voters = self.bb.get_voters()
-        for voter in voters:
-            cr_ids.append(voter["cr_id"])
+        cr_ids = self.bb.get_cr_ids()
         selected_cr_id = random.choice(cr_ids)
 
         ballot = self.bb.get_empty_ballot()
@@ -127,16 +124,13 @@ class Voting:
 
         circuit.gen_witness(working_dir+"input.json")
         circuit.prove(GROTH)
-        # circuit.export_vkey(output_file=working_dir+"vkey.json")
 
         proof_data = {"vkey":{}, "public": {}, "proof": {}}
-        # with open("circuits/FullCircuit/vkey.json", "r") as file:
-        #     proof_data["vkey"] = json.load(file)
         with open("circuits/FullCircuit/public.json", "r") as file:
             proof_data["public"] = json.load(file)
         with open("circuits/FullCircuit/proof.json", "r") as file:
             proof_data["proof"] = json.load(file)
-        
+
         return proof_data
 
     def get_c_id_and_tree_proof(self, id=0):
@@ -153,7 +147,7 @@ class Voting:
             (path_indices, siblings) = self.get_path_indices_and_siblings(MerklyTree(list(map(lambda x: int(x[1]), list_L))),int(tuple[1]))
             c_id = 0
         return (c_id, path_indices, siblings)
-    
+
     def get_path_indices_and_siblings(self, tree, leaf_value):
         path_indices = []
         siblings = []

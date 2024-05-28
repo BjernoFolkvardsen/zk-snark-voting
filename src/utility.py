@@ -15,15 +15,19 @@ class Utility :
     MTREE_DEPTH = 0
 
     @staticmethod
-    def commit(m):
-        random = Integer.random_range(min_inclusive=2, max_exclusive=Utility.GLOBAL_FIELD_P-1, randfunc=get_random_bytes)
+    def commit(m, T_from=2, T_to=GLOBAL_FIELD_P-1):
+        random = Integer.random_range(min_inclusive=T_from, max_exclusive=T_to, randfunc=get_random_bytes)
         commitment = Poseidon().hash([int(m),random])
         return (hex(commitment),random)
 
     @staticmethod
     def commit_verify(com,m,key):
-        return com == hex(Poseidon().hash([m,key])) 
-    
+        return com == hex(Poseidon().hash([m,key]))
+
+    @staticmethod
+    def get_pseudo_id(CR_from=2, CR_to=GLOBAL_FIELD_P-1):
+        return int(Integer.random_range(min_inclusive=CR_from, max_exclusive=CR_to, randfunc=get_random_bytes))
+
     @staticmethod
     def set_max_voters_and_mtree_depth(num_voters):
         Utility.MAX_NUMBER_OF_VOTERS = num_voters
@@ -191,12 +195,8 @@ class ElGamal():
     def decrypt(self, c1:int, c2:int):
         if not self.can_decrypt():
             raise CouldNotDecrypt("Can not decrypt without private key")
-        # Brute force decryption of possible positive messages
+        # Brute force decryption of possible messages
         for i in range(Utility.MAX_NUMBER_OF_VOTERS):
-            if pow(self.g,Integer(i),self.p) == Integer(c2 * pow(c1, -1*int(self.x), int(self.p))) % self.p :
-                return i
-        # Brute force decryption of possible negative messages
-        for i in range(int(self.p)-10,int(self.p)-1):
             if pow(self.g,Integer(i),self.p) == Integer(c2 * pow(c1, -1*int(self.x), int(self.p))) % self.p :
                 return i
         raise CouldNotDecrypt("Decryption of message failed! Message not in allowed massage space.")
@@ -209,9 +209,9 @@ class ElGamal():
         (b1,b2,r) = self.encrypt(m)
         b1 = Integer(b1)
         b2 = Integer(b2)
-        (c1, c2) = (a1* (pow(b1,(self.p-2), self.p)) % self.p), (a2 * (pow(b2,(self.p-2), self.p)) % self.p) 
+        (c1, c2) = (a1* (pow(b1,(self.p-2), self.p)) % self.p), (a2 * (pow(b2,(self.p-2), self.p)) % self.p)
         # Math is from this paper: https://medium.com/@VitalikButerin/exploring-elliptic-curve-pairings-c73c1864e627
-        # curve point division
+        # Curve point division
         z = Integer.random_range(min_inclusive=2, max_exclusive=self.p-2, randfunc=self.randfunc)  # Generate a random exponent z
         (c1, c2) = (pow(c1, z, self.p), pow(c2, z, self.p))  # Blind the ciphertext
         return (int(c2) * pow(int(c1), -1*int(self.x), int(self.p))) % int(self.p) == 1
