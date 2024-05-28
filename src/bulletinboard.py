@@ -223,6 +223,10 @@ class BullitinBoard:
 
     def get_ballot_by_cr_id(self, cr_id:str):
         return self.get_data(collection_name="ballots", query = {"key": cr_id}, many=True)
+    
+    def does_ballot_already_exist(self, cr_id:str, cand_id:str, e_v:tuple[str,str]):
+        result = self.get_data(collection_name="ballots", query = {"key": cr_id, "data."+cand_id+".vote.1":e_v[1]}, many=True)
+        return len(result) != 0
 
     ## Final ballots
     def set_final_ballots(self,final_ballot):

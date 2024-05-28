@@ -28,8 +28,8 @@ class Tally:
         for candidate_id in ballot:
             working_dir = os.path.dirname(os.path.realpath(__file__)) + "/../tmp/"
             circuit = Circuit("circuit.circom", working_dir=working_dir,output_dir=working_dir)
-            with open("tmp/vkey.json", "w") as file:
-                json.dump(ballot[candidate_id]["zk_proof"]["vkey"], file)
+            # with open("tmp/vkey.json", "w") as file:
+            #     json.dump(ballot[candidate_id]["zk_proof"]["vkey"], file)
             with open("tmp/public.json", "w") as file:
                 json.dump(ballot[candidate_id]["zk_proof"]["public"], file)
             with open("tmp/proof.json", "w") as file:

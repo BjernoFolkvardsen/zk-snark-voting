@@ -57,20 +57,20 @@ def run_election(num_voters,num_candidates,benchmark,re_vote_percent=0,null_vote
 if __name__ == "__main__":
     keys_list = ["num_voters", "num_candidates", "start_time", "setup_time", "registration_time", "voting_time", "tally_time", "end_time", "setup_time_taken_sec", "setup_time_taken_min", "registration_time_taken_sec", "registration_time_taken_min", "voting_time_taken_sec", "voting_time_taken_min", "tally_time_taken_sec", "tally_time_taken_min", "total_time_taken_sec", "total_time_taken_min"]
 
-    for percent in [0,0.2,0.4,0.6,0.8,1]:
+    # null_vote_percent = 0
+    # for revote_percent in [0]:
+    revote_percent = 0
+    for null_vote_percent in [0]:
         benchmark = []
         for num_voters in [5,10,25,50,75,100]:
-            for num_candidates in [2,5,10,20,30,40,50]:
-                benchmark = run_election(num_voters, num_candidates, benchmark, re_vote_percent=percent, null_vote_percent=0)
-                with open( str(num_voters)+'_'+str(num_candidates)+'_benchmark_'+str(percent)+'_revote_and_0_nullvote.csv', 'w', newline='') as file:
+            for num_candidates in [10]:
+                benchmark = run_election(num_voters, num_candidates, benchmark, re_vote_percent=revote_percent, null_vote_percent=null_vote_percent)
+                with open( str(num_voters)+'_'+str(num_candidates)+'_benchmark_'+str(revote_percent)+'_revote_and_'+str(null_vote_percent)+'_nullvote.csv', 'w', newline='') as file:
                     writer = csv.DictWriter(file, fieldnames = keys_list)
                     writer.writeheader()
                     writer.writerows(benchmark)
 
-            # Københavns Storkreds valg 2022, 549.738 voters, 131 candidates
-            # benchmark = run_election(549738, 131, benchmark)
-
-        with open('final_benchmark_'+str(percent)+'_revote_and_0_nullvote.csv', 'w', newline='') as file:
+        with open('final_benchmark_'+str(revote_percent)+'_revote_and_'+str(null_vote_percent)+'_nullvote.csv', 'w', newline='') as file:
             writer = csv.DictWriter(file, fieldnames = keys_list)
             writer.writeheader()
             writer.writerows(benchmark)

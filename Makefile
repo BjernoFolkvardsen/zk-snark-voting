@@ -43,6 +43,7 @@ compileWitness:
 
 clearNrun:
 	make clearFullCircuit
+	make clearTmp
 	make run
 
 clearAll:
@@ -53,6 +54,11 @@ clearAll:
 	make clearAndCircuit
 	make clearMerkleTreeInclusionCircuit
 	make clearElGamalCircuit
+
+clearTmp:
+	rm -f tmp/proof.json
+	rm -f tmp/public.json
+	rm -f tmp/vkey.json
 
 clearFullCircuit:
 	rm -rf circuits/FullCircuit/circuit_js/

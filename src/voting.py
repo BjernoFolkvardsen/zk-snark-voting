@@ -46,7 +46,12 @@ class Voting:
             ballot[candidate]["vote"] = e_v
             ballot[candidate]["zk_proof"] = self.zk_snark(c_id, vote, cr_id, t_id, e_v, r, g, pk_T, path_indices, siblings)
             
-        self.bb.set_ballot(ballot, cr_id)
+        ballot_exist = self.bb.does_ballot_already_exist(cr_id=cr_id, cand_id=str(v_id), e_v=e_v)
+        if ballot_exist:
+            print(f"Vote already made.")
+        else:
+            self.bb.set_ballot(ballot, cr_id)
+
     
     def change_vote(self, id, t_id, cr_id, pk_T, v_new, p, g, v_pre):
         elGamal = Utility.constructElGamal((p, g, pk_T))
@@ -65,7 +70,11 @@ class Voting:
             ballot[candidate]["vote"] = e_v
             ballot[candidate]["zk_proof"] = self.zk_snark(c_id, vote, cr_id, t_id, e_v, r, g, pk_T, path_indices, siblings)
 
-        self.bb.set_ballot(ballot, cr_id)
+        ballot_exist = self.bb.does_ballot_already_exist(cr_id=cr_id, cand_id=str(v_new), e_v=e_v)
+        if ballot_exist:
+            print(f"Vote already made.")
+        else:
+            self.bb.set_ballot(ballot, cr_id)
     
     def null_votes(self, p, g, pk_T):
         random.seed()
@@ -85,6 +94,7 @@ class Voting:
             e_v = [str(c1),str(c2)]
             ballot[candidate]["vote"] = e_v
             ballot[candidate]["zk_proof"] = self.zk_snark(c_id, 0, selected_cr_id, 0, e_v, r, g, pk_T, path_indices, siblings)
+
         self.bb.set_ballot(ballot, selected_cr_id)
 
 
@@ -117,11 +127,11 @@ class Voting:
 
         circuit.gen_witness(working_dir+"input.json")
         circuit.prove(GROTH)
-        circuit.export_vkey(output_file=working_dir+"vkey.json")
+        # circuit.export_vkey(output_file=working_dir+"vkey.json")
 
         proof_data = {"vkey":{}, "public": {}, "proof": {}}
-        with open("circuits/FullCircuit/vkey.json", "r") as file:
-            proof_data["vkey"] = json.load(file)
+        # with open("circuits/FullCircuit/vkey.json", "r") as file:
+        #     proof_data["vkey"] = json.load(file)
         with open("circuits/FullCircuit/public.json", "r") as file:
             proof_data["public"] = json.load(file)
         with open("circuits/FullCircuit/proof.json", "r") as file:

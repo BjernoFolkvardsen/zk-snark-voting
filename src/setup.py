@@ -61,4 +61,5 @@ class SetupManager:
         # circuit.print_constraints()
         circuit.setup(GROTH, ptau)
         circuit.contribute_phase2(entropy="p1", output_file=working_dir+"final.zkey")
+        circuit.export_vkey(output_file=working_dir+"../../tmp/vkey.json")
         self.bb.set_zkey_file_name(circuit.zkey_file)
