@@ -20,23 +20,19 @@ class VoterRegistration:
             self.register(eligible_voter["id"],c_id)
 
         self.publish_merkletree()
-        
+
     def register_voter(self, id, name):
-        cr_id = self.get_pseudonym(id)
-        (c_id,t_id) = Utility.commit(cr_id)
+        cr_id = Utility.get_pseudo_id(int(self.bb.get_public_params("CR_from")), int(self.bb.get_public_params("CR_to")))
+        (c_id,t_id) = Utility.commit(cr_id, int(self.bb.get_public_params("T_from")), int(self.bb.get_public_params("T_to")))
 
         c_id = int(c_id, 16)
-        self.bb.set_voter_commitments(c_id)
-        self.bb.set_voter(name, cr_id,id,t_id)
+        self.bb.set_cr_ids(cr_id)
+        self.bb.set_voter(name, cr_id,id,t_id) # just for testing purposes
         return (c_id, cr_id, t_id)
 
-    def get_pseudonym(self, value):
-        pseudonym = uuid.uuid4().int
-        return pseudonym
-    
     def register(self, id, c_id):
         self.bb.set_list_id_commitment((str(id), str(c_id)))
-    
+
     def publish_merkletree(self):
         tuple_list = []
         for i in range(pow(2,Utility.MTREE_DEPTH)-Utility.MAX_NUMBER_OF_VOTERS):
@@ -51,7 +47,6 @@ class VoterRegistration:
 
         self.bb.set_merkletree_root(str(rt_L.root))
         self.bb.set_merkletree_sigma(str(sigma))
-    
+
     def verify(self,rt_L, proof, c_id, L):
         return rt_L.verify(proof,c_id) and rt_L.verify_correctly_build(list(map(lambda x: int(x[1]), L)), self.bb.get_merkletree_root())
-        

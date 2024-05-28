@@ -19,7 +19,7 @@ class Voting:
 
         voters = self.bb.get_voters()
         votes_made = self.bb.get_votes()
-        elgamal = self.bb.get_elgamal()
+        elgamal = self.bb.get_public_params("elgamal")
         prime = int(elgamal["prime"])
         group = int(elgamal["group"])
         public_key = int(elgamal["public_key"])
@@ -116,11 +116,8 @@ class Voting:
     
     def null_votes(self, p, g, pk_T):
         random.seed()
-        cr_ids = []
-
-        voters = self.bb.get_voters()
-        for voter in voters:
-            cr_ids.append(voter["cr_id"])
+    
+        cr_ids = self.bb.get_cr_ids()
         selected_cr_id = random.choice(cr_ids)
 
         ballot = self.bb.get_empty_ballot()
@@ -165,6 +162,7 @@ class Voting:
 
         circuit.gen_witness(working_dir+"input.json")
         circuit.prove(GROTH)
+        
         proof_data = {"vkey":{}, "public": {}, "proof": {}}
         with open("circuits/FullCircuit/public.json", "r") as file:
             proof_data["public"] = json.load(file)

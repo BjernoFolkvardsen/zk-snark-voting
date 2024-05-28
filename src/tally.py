@@ -14,11 +14,7 @@ class Tally:
         self.bb = bb
     
     def tally(self):
-        cr_ids = []
-        voters = self.bb.get_voters()
-        for voter in voters:
-            cr_ids.append(voter["cr_id"])
-        
+        cr_ids = self.bb.get_cr_ids()
         random.shuffle(cr_ids)
         for cr_id in cr_ids:
             self.add_vote_same_pseudonym(cr_id)
@@ -51,7 +47,7 @@ class Tally:
 
     def add_vote_same_pseudonym(self, cr_id):
         ballots = self.bb.get_ballot_by_cr_id(cr_id)
-        elgamal = self.bb.get_elgamal()
+        elgamal = self.bb.get_public_params("elgamal")
         elgamal_priv_key = self.bb.get_private_param("elgamal_priv_key")
         elGamal = Utility.constructElGamal((int(elgamal["prime"]), int(elgamal["group"]), int(elgamal["public_key"]), int(elgamal_priv_key)))
         x = 0
@@ -75,7 +71,7 @@ class Tally:
     
     def check_valid_ballot(self):
         final_ballots = self.bb.get_final_ballots()
-        elgamal = self.bb.get_elgamal()
+        elgamal = self.bb.get_public_params("elgamal")
         elgamal_priv_key = self.bb.get_private_param("elgamal_priv_key")
         elGamal = Utility.constructElGamal((int(elgamal["prime"]), int(elgamal["group"]), int(elgamal["public_key"]), int(elgamal_priv_key)))
         final_valid_ballots = []
@@ -98,7 +94,7 @@ class Tally:
         return final_valid_ballots
 
     def calculate_results(self, valid_ballots):
-        elgamal = self.bb.get_elgamal()
+        elgamal = self.bb.get_public_params("elgamal")
         elgamal_priv_key = self.bb.get_private_param("elgamal_priv_key")
         elGamal = Utility.constructElGamal((int(elgamal["prime"]), int(elgamal["group"]), int(elgamal["public_key"]), int(elgamal_priv_key)))
         candidates = self.bb.get_candidates()
