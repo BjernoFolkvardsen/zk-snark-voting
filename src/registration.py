@@ -3,7 +3,6 @@ from src.merkly import MerklyTree
 from src.utility import Utility
 from Crypto.PublicKey import ECC
 from Crypto.Signature import eddsa
-import uuid
 
 class VoterRegistration:
 
